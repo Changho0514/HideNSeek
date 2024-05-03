@@ -1,3 +1,4 @@
+import { Triplet } from '@react-three/cannon';
 import { Vector3 } from 'three';
 
 export interface PlayerInitType {
@@ -65,4 +66,8 @@ export interface CollideObject {
     maxY: number;
     minZ: number;
     maxZ: number;
+}
+export interface ObjectSettingType {
+    position: Triplet;
+    rotation?: Triplet;
 }

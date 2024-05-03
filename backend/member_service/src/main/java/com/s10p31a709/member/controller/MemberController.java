@@ -1,18 +1,24 @@
 package com.s10p31a709.member.controller;
 
 import com.s10p31a709.member.common.response.BaseResponse;
+import com.s10p31a709.member.entity.Channel;
 import com.s10p31a709.member.entity.Member;
+import com.s10p31a709.member.service.GameServiceClient;
 import com.s10p31a709.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
+    private final GameServiceClient gameServiceClient;
 
     @GetMapping("/{nickname}")
     @Operation(summary = "유저 정보 반환")
@@ -50,6 +56,14 @@ public class MemberController {
     public ResponseEntity<?> deleteGuest(@PathVariable String nickname){
         memberService.deleteGuest(nickname);
         return BaseResponse.success(200, "삭제 성공");
+    }
+
+    @GetMapping("/channel")
+    @Operation(summary = "채널 목록 반환")
+    public ResponseEntity<?> channelList(){
+        List<Channel> list = new ArrayList<>();
+        list.add(gameServiceClient.channelInfo().getData());
+        return BaseResponse.success(200, "채널 목록 반환 성공", list);
     }
 
 }

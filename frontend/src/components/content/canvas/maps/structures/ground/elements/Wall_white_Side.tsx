@@ -18,7 +18,7 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Wall_white(props: ObjectSettingType) {
+export function Wall_white_Side(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Wall_white.glb'
     ) as GLTFResult;
@@ -31,7 +31,7 @@ export function Wall_white(props: ObjectSettingType) {
         angularFactor: [0, 0, 0], // 모든 축에 대해 회전 제한
     }));
     return (
-        <group position={[0, -4, -5]} dispose={null}>
+        <group position={[-5, -4, 0]} dispose={null}>
             <mesh
                 ref={ref}
                 geometry={nodes.Wall_38.geometry}

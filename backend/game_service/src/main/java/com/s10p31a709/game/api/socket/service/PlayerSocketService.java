@@ -82,4 +82,10 @@ public class PlayerSocketService {
         StompPayload<int[]> payload = new StompPayload<>("player.choose", roomId, "system", arr);
         simpMessagingTemplate.convertAndSend("/sub/room/"+roomId, payload);
     }
+    
+    public void playerFix(StompPayload<Player> message){
+        String roomId = message.getRoomId();;
+        Player player = message.getData();
+        // 숨은 정보 log 전송
+    }
 }

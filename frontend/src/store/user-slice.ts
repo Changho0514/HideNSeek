@@ -78,6 +78,9 @@ export const userSlice = createSlice({
         givenChoiceState: (state, action) => {
             state.givenChoice = action.payload;
         },
+        collideObjectState: (state, action) => {
+            state.collideObj = action.payload;
+        },
         addCollideObjectState: (state, action) => {
             state.collideObj = [...state.collideObj, action.payload];
         },
@@ -101,5 +104,6 @@ export const {
     givenChoiceState,
     addCollideObjectState,
     removeCollideObjectState,
+    collideObjectState,
 } = userSlice.actions;
 export default userSlice.reducer;

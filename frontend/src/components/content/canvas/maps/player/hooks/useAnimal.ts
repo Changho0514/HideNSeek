@@ -10,10 +10,15 @@ import {
     Vector3,
     Quaternion,
 } from 'three';
-import { PlayerInitType } from '../../../../../../types/GameType';
+import {
+    CollideObject,
+    PlayerInitType,
+} from '../../../../../../types/GameType';
 import StompClient from '../../../../../../websocket/StompClient';
 import { useSelector } from 'react-redux';
 import { GLTF, SkeletonUtils } from 'three-stdlib';
+import { removeCollideObjectState } from '../../../../../../store/user-slice';
+import { store } from '../../../../../../store/store';
 
 interface GLTFAction extends AnimationClip {
     name: ActionName;
@@ -69,7 +74,7 @@ type ActionName =
 export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
     const [isWalking, setIsWalking] = useState(false);
     const keyState = useRef<{ [key: string]: boolean }>({});
-
+    const [isJumping, setIsJumping] = useState(0);
     // Redux
     const playerNickname = player?.nickname;
     const meName = useSelector(
@@ -84,9 +89,9 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
     const roomState = useSelector(
         (state: any) => state.reduxFlag.userSlice.currentRoom
     );
-    // const collideState = useSelector(
-    //     (state: any) => state.reduxFlag.userSlice.collideObj
-    // );
+    const collideState = useSelector(
+        (state: any) => state.reduxFlag.userSlice.collideObj
+    );
 
     const stompClient = StompClient.getInstance();
 
@@ -243,13 +248,13 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
     useEffect(() => {
         if (isWalking) {
             lockPointer();
-            if (!actions['Roll']?.isRunning()) {
+            if (!actions['Walk']?.isRunning()) {
                 // Run 상태가 아닌경우 Run으로
-                actions['Roll']?.reset().fadeIn(0.2).play();
+                actions['Walk']?.reset().fadeIn(0.2).play();
             }
         } else {
             // not walking
-            if (actions['Roll']?.isRunning()) {
+            if (actions['Walk']?.isRunning()) {
                 actions['Idle_A']?.reset().fadeIn(0.2).play();
             }
         }
@@ -259,6 +264,9 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
     useEffect(() => {
         const handleKeyDown = (event: any) => {
             keyState.current[event.key] = true;
+            if (event.code === 'Space' && isJumping === 0) {
+                setIsJumping(1);
+            }
         };
 
         const handleKeyUp = (event: any) => {
@@ -272,6 +280,19 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
             document.removeEventListener('keyup', handleKeyUp);
         };
     }, [isWalking]);
+    useEffect(() => {
+        if (isJumping === 1) {
+            console.log('점프중입니다.');
+            setTimeout(() => {
+                console.log('점프 내려가는 중입니다.');
+                setIsJumping(2);
+            }, 600); // Return after half a second
+            setTimeout(() => {
+                console.log('점프 끝입니다.');
+                setIsJumping(0);
+            }, 1200);
+        }
+    }, [isJumping]);
 
     // Frame
     useFrame(({ camera }) => {
@@ -294,11 +315,11 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
                     (keyState.current['w'] ? 1 : 0)
             );
 
-            if (!moveVector.equals(new Vector3(0, 0, 0))) {
+            if (!moveVector.equals(new Vector3(0, 0, 0)) || isJumping != 0) {
                 // 이동중
                 moveVector.normalize().multiplyScalar(0.2); // 속도조절
                 setIsWalking(true);
-                setAnimation('Roll');
+                setAnimation('Walk');
                 // 캐릭터가 바라보는 방향으로 이동 벡터를 회전시킵니다.
                 const forward = new Vector3(0, 0, -1).applyQuaternion(
                     playerRef.current.quaternion
@@ -311,22 +332,75 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
                             moveVector.x
                         )
                     );
-                // if (collideState.length > 0) {
-                //     const newPos =
-                //         playerRef.current.position.add(moveDirection);
-                //     collideState.map((item: CollideObject, index: number) => {
-                //         if (
-                //             newPos.x >= item.minX &&
-                //             newPos.x <= item.maxX &&
-                //             newPos.y >= item.minY &&
-                //             newPos.y <= item.maxY &&
-                //             newPos.z >= item.minZ &&
-                //             newPos.z <= item.maxZ
-                //         ) {
-                //         }
-                //     });
-                // }
-                playerRef.current.position.add(moveDirection);
+                if (isJumping === 1) {
+                    moveDirection.y = 0.08;
+                } else {
+                    moveDirection.y = -0.08;
+                }
+                console.log(moveDirection);
+
+                if (collideState.length > 0) {
+                    console.log(moveDirection);
+                    const originPos = playerRef.current.position.clone();
+                    const newPos = originPos.clone().add(moveDirection);
+                    collideState.map((item: CollideObject, index: number) => {
+                        const centerX = (item.minX + item.maxX) / 2;
+                        const centerY = (item.minY + item.maxZ) / 2;
+                        const centerZ = (item.minY + item.maxZ) / 2;
+
+                        if (
+                            originPos.x >= item.minX - 1 &&
+                            originPos.x <= item.maxX + 1 &&
+                            originPos.y >= item.minY - 1 &&
+                            originPos.y <= item.maxY + 1 &&
+                            originPos.z >= item.minZ - 1 &&
+                            originPos.z <= item.maxZ + 1
+                        ) {
+                            if (originPos.x < centerX) {
+                                if (newPos.x > originPos.x) {
+                                    moveDirection.x = 0;
+                                }
+                            } else if (originPos.x >= centerX) {
+                                if (newPos.x <= originPos.x) {
+                                    moveDirection.x = 0;
+                                }
+                            }
+                            if (originPos.y < centerY) {
+                                if (newPos.y > originPos.y) {
+                                    moveDirection.y = 0;
+                                }
+                            } else if (originPos.y >= centerY) {
+                                if (newPos.y <= originPos.y) {
+                                    moveDirection.y = 0;
+                                }
+                            }
+                            if (originPos.z < centerZ) {
+                                if (newPos.z > originPos.z) {
+                                    moveDirection.z = 0;
+                                }
+                            } else if (originPos.z >= centerZ) {
+                                if (newPos.z <= originPos.z) {
+                                    moveDirection.z = 0;
+                                }
+                            }
+                            if (playerRef.current) {
+                                if (playerRef.current.position.y <= 0) {
+                                    playerRef.current.position.y = 0.1;
+                                }
+                                playerRef.current.position.add(moveDirection);
+                            }
+                        } else {
+                            store.dispatch(removeCollideObjectState(index));
+                        }
+                    });
+                } else {
+                    if (playerRef.current.position.y <= 0) {
+                        playerRef.current.position.y = 0.1;
+                    }
+                    playerRef.current.position.add(moveDirection);
+
+                    console.log(playerRef.current.position);
+                }
 
                 stompClient.sendMessage(
                     `/player.move`,
@@ -352,6 +426,8 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
             } else {
                 // 고정된 상태
                 setIsWalking(false);
+                setAnimation('Roll');
+                
                 stompClient.sendMessage(
                     `/player.move`,
                     JSON.stringify({
@@ -373,7 +449,7 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
                         },
                     })
                 );
-                setAnimation('Roll');
+                setAnimation('Walk');
             }
 
             // 카메라 설정

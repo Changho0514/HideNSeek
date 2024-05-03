@@ -1,97 +1,102 @@
 [
     {
         "index": 0,
-        "thumbnail": "/public/images/thumbnail/Barrel.jpg",
+        "thumbnail": "/images/thumbnail/Barrel.jpg",
         "name": "통"
     },
     {
         "index": 1,
-        "thumbnail": "/public/images/thumbnail/Closet.jpg",
+        "thumbnail": "/images/thumbnail/Closet.jpg",
         "name": "옷장"
     },
     {
         "index": 2,
-        "thumbnail": "/public/images/thumbnail/Chair_brown.jpg",
+        "thumbnail": "/images/thumbnail/Chair_brown.jpg",
         "name": "갈색 의자"
     },
     {
         "index": 3,
-        "thumbnail": "/public/images/thumbnail/Chair_white.jpg",
+        "thumbnail": "/images/thumbnail/Chair_white.jpg",
         "name": "흰색 의자"
     },
     {
         "index": 4,
-        "thumbnail": "/public/images/thumbnail/Doll_pig.jpg",
+        "thumbnail": "/images/thumbnail/Doll_pig.jpg",
         "name": "돼지 인형"
     },
     {
         "index": 5,
-        "thumbnail": "/public/images/thumbnail/Drawer_brown_1.jpg",
+        "thumbnail": "/images/thumbnail/Drawer_brown_1.jpg",
         "name": "선반1"
     },
     {
         "index": 6,
-        "thumbnail": "/public/images/thumbnail/Drawer_brown_2.jpg",
+        "thumbnail": "/images/thumbnail/Drawer_brown_2.jpg",
         "name": "선반2"
     },
     {
         "index": 7,
-        "thumbnail": "/public/images/thumbnail/Drawer_brown_3.jpg",
+        "thumbnail": "/images/thumbnail/Drawer_brown_3.jpg",
         "name": "선반3"
     },
     {
         "index": 8,
-        "thumbnail": "/public/images/thumbnail/Drawer_brown_4.jpg",
+        "thumbnail": "/images/thumbnail/Drawer_brown_4.jpg",
         "name": "선반4"
     },
     {
         "index": 9,
-        "thumbnail": "/public/images/thumbnail/Drawer_brown_5.jpg",
+        "thumbnail": "/images/thumbnail/Drawer_brown_5.jpg",
         "name": "선반5"
     },
     {
         "index": 10,
-        "thumbnail": "/public/images/thumbnail/Ladder_brown.jpg",
+        "thumbnail": "/images/thumbnail/Ladder_brown.jpg",
         "name": "갈색 사다리"
     },
     {
         "index": 11,
-        "thumbnail": "/public/images/thumbnail/Ladder_white.jpg",
+        "thumbnail": "/images/thumbnail/Ladder_white.jpg",
         "name": "흰색 사다리"
     },
     {
         "index": 12,
-        "thumbnail": "/public/images/thumbnail/LongTable_white.jpg",
+        "thumbnail": "/images/thumbnail/LongTable_white.jpg",
         "name": "긴 테이블"
     },
     {
         "index": 13,
-        "thumbnail": "/public/images/thumbnail/Meet_full.jpg",
+        "thumbnail": "/images/thumbnail/Meet_full.jpg",
         "name": "대형 고기"
     },
     {
         "index": 14,
-        "thumbnail": "/public/images/thumbnail/Meet_half.jpg",
+        "thumbnail": "/images/thumbnail/Meet_half.jpg",
         "name": "고기 반쪽"
     },
     {
         "index": 15,
-        "thumbnail": "/public/images/thumbnail/Pot_orange.jpg",
+        "thumbnail": "/images/thumbnail/Pot_orange.jpg",
         "name": "오렌지 냄비"
     },
     {
         "index": 16,
-        "thumbnail": "/public/images/thumbnail/Pot_pink.jpg",
+        "thumbnail": "/images/thumbnail/Pot_pink.jpg",
         "name": "핑크색 냄비"
     },
     {
         "index": 17,
-        "thumbnail": "/public/images/thumbnail/Refrigerator.jpg",
+        "thumbnail": "/images/thumbnail/Refrigerator.jpg",
         "name": "냉장고"
     },
     {
         "index": 18,
-        "thumbnail": "/public/images/thumbnail/RoundTable_brown.jpg",
+        "thumbnail": "/images/thumbnail/RoundTable_brown.jpg",
+        "name": "원형탁자"
+    },
+    {
+        "index": 18,
+        "thumbnail": "/images/thumbnail/RoundTable_brown.jpg",
         "name": "원형탁자"
     }
 ]
