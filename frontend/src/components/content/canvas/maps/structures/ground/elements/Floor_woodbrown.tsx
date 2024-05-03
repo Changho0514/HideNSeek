@@ -6,6 +6,8 @@ Command: npx gltfjsx@6.2.16 public/models/object/Floor_woodbrown.glb -t -o src/c
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
+import { ObjectSettingType } from '../../../../../../../types/GameType';
+import { useBox } from '@react-three/cannon';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -17,17 +19,27 @@ type GLTFResult = GLTF & {
     animations: any[];
 };
 
-export function Floor_woodbrown(props: JSX.IntrinsicElements['group']) {
+export function Floor_woodbrown(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Floor_woodbrown.glb'
     ) as GLTFResult;
+    const [ref] = useBox<THREE.Mesh>(() => ({
+        args: [10, 10, 0.2],
+        mass: 0.1,
+        type: 'Static',
+        position: props.position,
+        rotation: props.rotation,
+        linearFactor: [0, 0, 0], // 모든 축에 대해 이동 제한
+        angularFactor: [0, 0, 0], // 모든 축에 대해 회전 제한
+    }));
     return (
-        <group {...props} dispose={null}>
+        <group dispose={null}>
             <mesh
+                ref={ref}
                 geometry={nodes.Floor_9.geometry}
                 material={materials['Cartoon_Room_Mat.002']}
-                position={[0, 0, 0]}
-                rotation={[Math.PI / 2, 0, 0]}
+                position={props.position}
+                rotation={props.rotation}
                 scale-y={0.0202}
                 scale-x={0.0202}
                 scale-z={0.01}

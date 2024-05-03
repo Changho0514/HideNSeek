@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
+    collideObjectState,
     currentRoomState,
     givenChoiceState,
     readyState,
@@ -26,6 +27,7 @@ export default function MainPage() {
         })
     );
     dispatch(givenChoiceState(''));
+    dispatch(collideObjectState([]));
 
     return (
         <section

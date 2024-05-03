@@ -15,7 +15,7 @@ export function Tree({ position }: ObjectType) {
     }, []);
 
     const [ref] = useBox<Mesh>(() => ({
-        args: [8, 8, 8],
+        args: [4, 12, 6],
         mass: 0.1,
         position: [position[0], position[1], position[2]],
         linearFactor: [0, 0, 0], // 모든 축에 대해 이동 제한

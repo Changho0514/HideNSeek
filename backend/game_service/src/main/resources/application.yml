@@ -1,8 +1,8 @@
 server:
   port: 8002
-  domain: http://jongbum.site
+  domain: https://k10a709.p.ssafy.io
   servlet:
-    contextPath: "/api/game-service/"
+    contextPath: "/api/game-service"
     encoding:
       charset: UTF-8
       enabled: true

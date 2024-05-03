@@ -1,8 +1,8 @@
 server:
   port: 8001
-  domain: http://jongbum.site
+  domain: https://k10a709.p.ssafy.io
   servlet:
-    contextPath: "/api/member-service/"
+    contextPath: "/api/member-service"
     encoding:
       charset: UTF-8
       enabled: true
@@ -14,7 +14,7 @@ spring:
   devtools:
     livereload:
       enabled: true
-  datasource:
+  datasource: 
 #    hikari:
 #      driver-class-name: org.mariadb.jdbc.Driver
 #      username: S10P31A709

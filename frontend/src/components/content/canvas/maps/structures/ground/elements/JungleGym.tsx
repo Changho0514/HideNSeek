@@ -11,7 +11,7 @@ export function JungleGym() {
     const [ref] = useBox<Mesh>(() => ({
         args: [8, 8, 8],
         mass: 0.1,
-        position: [8, 1, 8],
+        position: [8, 0, 8],
         linearFactor: [0, 0, 0], // 모든 축에 대해 이동 제한
         angularFactor: [0, 0, 0], // 모든 축에 대해 회전 제한
     }));

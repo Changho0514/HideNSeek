@@ -89,6 +89,7 @@ public class RoomSocketService {
 
     public void seekerWin(String roomId){
         Room room = roomRepository.findRoomByRoomId(roomId);
+        // 게임 결과 log 전송
         room.setRoomTime(gameProperties.getTime().getResult());
         room.setRoomState(4);
 
@@ -98,6 +99,7 @@ public class RoomSocketService {
 
     public void hiderWin(String roomId){
         Room room = roomRepository.findRoomByRoomId(roomId);
+        // 게임 결과 log 전송
         room.setRoomTime(gameProperties.getTime().getResult());
         room.setRoomState(5);
 

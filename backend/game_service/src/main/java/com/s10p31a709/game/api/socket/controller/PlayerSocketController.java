@@ -79,4 +79,10 @@ public class PlayerSocketController {
         playerSocketService.choosePlayer(message.getRoomId());
     }
 
+    @MessageMapping("/player.fix") @DeleteMapping("/player.fix")
+    @Operation(summary = "숨는 장소 기록", description = "log를 남기기위한 목적")
+    public void playerFix(@Payload StompPayload<Player> message) {
+        playerSocketService.playerFix(message);
+    }
+
 }
