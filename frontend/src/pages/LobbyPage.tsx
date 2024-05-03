@@ -216,17 +216,29 @@ export default function LobbyPage() {
                                         <p>
                                             {index}.{item.roomTitle}
                                         </p>
-                                        <p className="mx-[1vw] text-[1vw]">
-                                            공개
-                                        </p>
+                                        {item.isPublic ? (
+                                            <p className="mx-[1vw] text-[1vw]">
+                                                공개
+                                            </p>
+                                        ) : (
+                                            <p className="mx-[1vw] text-[1vw]">
+                                                비공개
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="flex flex-col">
                                         <p className="text-[1.6vw]">
                                             {item.roomPlayers.length}/6
                                         </p>
-                                        <p className="text-[1.6vw] text-red-600">
-                                            게임중
-                                        </p>
+                                        {item.roomState === 0 ? (
+                                            <p className="text-[1.6vw] text-sky-400">
+                                                대기중
+                                            </p>
+                                        ) : (
+                                            <p className="text-[1.6vw] text-red-600">
+                                                게임중
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             );

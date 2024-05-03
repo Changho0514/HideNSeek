@@ -1,0 +1,6 @@
+
+#logstash가 주기적으로 pipeline 설정파일을 다시 읽어와서 pipeline을 구축 함
+config.reload.automatic: true
+
+#logstash가 pipeline 설정파일을 읽어오는 주기를 설정(하기는 3초에 한번씩 읽어 옮)
+config.reload.interval: 3s

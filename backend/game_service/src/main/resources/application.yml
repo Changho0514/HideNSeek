@@ -20,8 +20,20 @@ logging:
   level:
     org:
       springframework:
-        messaging: DEBUG
+        messaging: INFO
         web:
-          socket: DEBUG
+          socket: INFO
       hibernate.orm.jdbc.bind: TRACE
-    com.s10p31a709.game.common.aop: TRACE
+    com.s10p31a709.game.common.aop: INFO
+
+game:
+  time:
+    waiting: 10
+    hide: 30
+    seek: 90
+    result: 10
+  maxCapacity: 6
+  object:
+    maxSeekerIdx: 14
+    maxHiderIdx: 20
+  fps: 20

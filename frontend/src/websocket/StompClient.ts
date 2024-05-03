@@ -3,6 +3,7 @@ import { handshake } from './client';
 import {
     addPeopleRoomState,
     currentRoomState,
+    givenChoiceState,
     readyState,
     removePeopleRoomState,
 } from '../store/user-slice';
@@ -56,6 +57,11 @@ class StompClient {
                                 console.log('플레이어 사망', msg);
                                 break;
                             }
+                            case 'player.choose': {
+                                console.log('플레이어 선택지', msg);
+                                store.dispatch(givenChoiceState(msg.data));
+                                break;
+                            }
                             /** 게임 입장 (요청 필요) */
                             case 'room.gameInit': {
                                 console.log('게임 입장', msg);
@@ -64,7 +70,7 @@ class StompClient {
                                 break;
                             }
                             case 'player.object': {
-                                // console.log('물체 변경', msg);
+                                console.log('물체 변경', msg);
                                 break;
                             }
                             /** 플레이어 위치 정보 반환 */
@@ -99,6 +105,10 @@ class StompClient {
                             case 'room.backRoom': {
                                 console.log('대기실로 이동', msg);
                                 store.dispatch(currentRoomState(msg.data));
+                                break;
+                            }
+                            default: {
+                                console.log('여분의 msg', msg);
                                 break;
                             }
                         }
@@ -140,7 +150,7 @@ class StompClient {
                     /** 플레이어 위치 정보 반환 */
                     case 'room.gameState': {
                         console.log('위치 반환');
-                        console.log(msg);
+                        // console.log(msg);ws
                         store.dispatch(currentRoomState(msg.data));
                         break;
                     }

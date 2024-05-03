@@ -38,4 +38,10 @@ public class ChatSocketController {
         simpMessagingTemplate.convertAndSend("/sub/room/"+message.getRoomId(), message);
     }
 
+    @MessageMapping("/chat.voice") @DeleteMapping("/chat.voice")
+    @Operation(summary = "음성 채팅 소켓", description="음성채팅 연결 시 /sub/voice/{roomId} 로 구독")
+    public void chatVoice(@Payload StompPayload<Chat> message) {
+        simpMessagingTemplate.convertAndSend("/sub/voice/"+message.getRoomId(), message);
+    }
+
 }

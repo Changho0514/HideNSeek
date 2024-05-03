@@ -6,11 +6,10 @@ import { CurrentPlayersInfo, RoomInfo } from '../../types/GameType';
 import { useEffect, useState } from 'react';
 import { meInfoState, meSelectedInfoState } from '../../store/user-slice';
 import StompClient from '../../websocket/StompClient';
-
+import ObjectInfo from '../../json/ObjectInfo.json';
 export function Content() {
     const dispatch = useDispatch();
     const stompClient = StompClient.getInstance();
-
     //방정보.
     const roomState: RoomInfo = useSelector(
         (state: any) => state.reduxFlag.userSlice.currentRoom
@@ -20,6 +19,9 @@ export function Content() {
     );
     const meInfo = useSelector(
         (state: any) => state.reduxFlag.userSlice.meInfo
+    );
+    const givenChoice = useSelector(
+        (state: any) => state.reduxFlag.userSlice.givenChoice
     );
     //내정보.
     const [me, setMe] = useState<CurrentPlayersInfo>({
@@ -34,6 +36,8 @@ export function Content() {
     const [players, setPlayers] = useState<CurrentPlayersInfo[]>(
         roomState.roomPlayers
     );
+    const [choice, setChoice] = useState<number[]>([1, 2, 3]);
+    const [choiceFlag, setChoiceFlag] = useState<boolean>(false);
     useEffect(() => {
         if (meInfo.nickname !== '') {
             setMe(meInfo);
@@ -42,42 +46,7 @@ export function Content() {
     useEffect(() => {
         setPlayers(roomState.roomPlayers);
     }, [roomState]);
-    useEffect(() => {
-        if (me.nickname !== '' && me.selectedIndex !== null) {
-            // console.log('보낼게욧', me);
-            // console.log(
-            //     JSON.stringify({
-            //         type: 'player.object',
-            //         roomId: roomState.roomId,
-            //         sender: meName,
-            //         data: {
-            //             nickname: me.nickname,
-            //             selectedIndex: me.selectedIndex,
-            //             position: me.position,
-            //             direction: me.direction,
-            //             isDead: me.isDead,
-            //             isSeeker: me.isSeeker,
-            //         },
-            //     })
-            // );
-            stompClient.sendMessage(
-                `/player.object`,
-                JSON.stringify({
-                    type: 'player.object',
-                    roomId: roomState.roomId,
-                    sender: meName,
-                    data: {
-                        nickname: me.nickname,
-                        selectedIndex: me.selectedIndex,
-                        position: me.position,
-                        direction: me.direction,
-                        isDead: me.isDead,
-                        isSeeker: me.isSeeker,
-                    },
-                })
-            );
-        }
-    }, [me]);
+
     useEffect(() => {
         if (roomState) {
             roomState.roomPlayers.map((item: CurrentPlayersInfo) => {
@@ -87,14 +56,37 @@ export function Content() {
             });
         }
     }, [roomState]);
+    useEffect(() => {
+        if (givenChoice.length === 3) {
+            setChoice(givenChoice);
+            console.log(givenChoice);
+        }
+    }, [givenChoice]);
 
     const handleSelectedIndex = (index: number) => {
         setMe((prevMe) => ({ ...prevMe, selectedIndex: index })); // 새 객체를 반환하여 selectedIndex 업데이트
 
         console.log('처음 players', players);
         const updatedPlayers = players.map((player) => {
-            if (player.nickname === me.nickname) {
+            if (player.nickname === me.nickname && !choiceFlag) {
                 setMe((prev) => ({ ...prev, selectedIndex: index }));
+                setChoiceFlag(true);
+                stompClient.sendMessage(
+                    `/player.object`,
+                    JSON.stringify({
+                        type: 'player.object',
+                        roomId: roomState.roomId,
+                        sender: meName,
+                        data: {
+                            nickname: me.nickname,
+                            selectedIndex: index,
+                            position: me.position,
+                            direction: me.direction,
+                            isDead: me.isDead,
+                            isSeeker: me.isSeeker,
+                        },
+                    })
+                );
                 return { ...player, selectedIndex: index };
             }
             return player;
@@ -104,12 +96,6 @@ export function Content() {
         dispatch(meSelectedInfoState(index));
     };
 
-    const selectedList: number[] = [
-        Math.floor(Math.random() * 19 + 1),
-        Math.floor(Math.random() * 19 + 1),
-        Math.floor(Math.random() * 19 + 1),
-    ];
-
     return (
         <>
             {me ? (
@@ -118,48 +104,32 @@ export function Content() {
                     !me.isSeeker &&
                     me.selectedIndex === null ? (
                         <div className="absolute flex items-center justify-between w-[80%] h-[80%] z-10">
-                            <div className="w-[30%] h-[80%] flex flex-col justify-center items-center bg-white border-[0.4vw] rounded-[0.6vw] border-gray-700">
-                                나무
-                                <p
-                                    className="bg-red-200 px-[2vw] py-[1vw] rounded-[0.6vw] border-[0.2vw] border-red-500 cursor-pointer"
-                                    onClick={() => {
-                                        handleSelectedIndex(selectedList[0]);
-                                    }}
-                                >
-                                    선택하기
-                                </p>
-                                <p className=" py-[1vw] px-[1vw] bg-sky-200 border-[0.2vw] border-sky-400 rounded-[0.6vw] my-[0.4vw] cursor-pointer">
-                                    리롤하기
-                                </p>
-                            </div>
-                            <div className="w-[30%] h-[80%] flex flex-col justify-center items-center bg-white border-[0.4vw] rounded-[0.6vw] border-gray-700">
-                                트리
-                                <p
-                                    className="bg-red-200 px-[2vw] py-[1vw] rounded-[0.6vw] border-[0.2vw] border-red-500 cursor-pointer"
-                                    onClick={() => {
-                                        handleSelectedIndex(selectedList[1]);
-                                    }}
-                                >
-                                    선택하기
-                                </p>{' '}
-                                <p className=" py-[1vw] px-[1vw] bg-sky-200 border-[0.2vw] border-sky-400 rounded-[0.6vw] my-[0.4vw] cursor-pointer">
-                                    리롤하기
-                                </p>
-                            </div>
-                            <div className="w-[30%] h-[80%] flex flex-col justify-center items-center bg-white border-[0.4vw] rounded-[0.6vw] border-gray-700">
-                                미끄럼틀
-                                <p
-                                    className="bg-red-200 px-[2vw] py-[1vw] rounded-[0.6vw] border-[0.2vw] border-red-500 cursor-pointer"
-                                    onClick={() => {
-                                        handleSelectedIndex(selectedList[2]);
-                                    }}
-                                >
-                                    선택하기
-                                </p>{' '}
-                                <p className=" py-[1vw] px-[1vw] bg-sky-200 border-[0.2vw] border-sky-400 rounded-[0.6vw] my-[0.4vw] cursor-pointer">
-                                    리롤하기
-                                </p>
-                            </div>
+                            {choice.map((item, index) => {
+                                return (
+                                    <div
+                                        key={'selectKey :' + index}
+                                        className="w-[30%] h-[80%] flex flex-col justify-center items-center bg-white border-[0.4vw] rounded-[0.6vw] border-gray-700"
+                                    >
+                                        <img
+                                            className="relative w-50 h-40 object-fill"
+                                            src={ObjectInfo[item].thumbnail}
+                                            alt=""
+                                        />
+                                        {ObjectInfo[item].name}
+                                        <p
+                                            className="bg-red-200 px-[2vw] py-[1vw] rounded-[0.6vw] border-[0.2vw] border-red-500 cursor-pointer"
+                                            onClick={() => {
+                                                handleSelectedIndex(item);
+                                            }}
+                                        >
+                                            선택하기
+                                        </p>
+                                        <p className=" py-[1vw] px-[1vw] bg-sky-200 border-[0.2vw] border-sky-400 rounded-[0.6vw] my-[0.4vw] cursor-pointer">
+                                            리롤하기
+                                        </p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     ) : (
                         <></>

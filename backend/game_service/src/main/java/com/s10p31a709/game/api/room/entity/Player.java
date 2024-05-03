@@ -19,9 +19,9 @@ public class Player {
     @JsonProperty("isSeeker")
     private Boolean isSeeker;
 
-    private Integer[] position;
+    private Double[] position;
 
-    private Integer[] direction;
+    private Double[] direction;
 
     @JsonIgnore
     private String sessionId;

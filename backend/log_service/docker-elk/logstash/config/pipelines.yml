@@ -7,14 +7,14 @@
 #node.name: logstash
 
 - pipeline.id: logtest
-  path.config: 'usr/share/logstash/pipeline/logtest.conf' #docker 내부 경로
+  path.config: "/usr/share/logstash/pipeline/logtest.conf" #docker 내부 경로
 
 
 - pipeline.id: testserverlogs
-  path.config: 'usr/share/logstash/pipeline/testserverlogs.conf' #docker 내부 경로
+  path.config: "/usr/share/logstash/pipeline/testserverlogs.conf" #docker 내부 경로
 
 - pipeline.id: gameserverlogs
-  path.config: 'usr/share/logstash/pipeline/gameserverlogs.conf' #docker 내부 경로
+  path.config: "/usr/share/logstash/pipeline/gameserverlogs.conf" #docker 내부 경로
 
 - pipeline.id: memberserverlogs
-  path.config: 'usr/share/logstash/pipeline/memberserverlogs.conf' #docker 내부 경로
+  path.config: "/usr/share/logstash/pipeline/memberserverlogs.conf" #docker 내부 경로

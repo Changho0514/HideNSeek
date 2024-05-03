@@ -9,7 +9,6 @@ RUN npm run build
 
 FROM nginx:latest
 WORKDIR /usr/share/nginx/statics
-RUN rm /etc/nginx/conf.d/default.conf
 COPY ./nginx.conf /etc/nginx/conf.d
 COPY --from=builder /app/dist .
 EXPOSE 80

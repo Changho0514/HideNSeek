@@ -1,6 +1,7 @@
 package com.s10p31a709.game;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.s10p31a709.game.common.config.GameProperties;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -16,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @EnableFeignClients
 @EnableScheduling
+@EnableConfigurationProperties(GameProperties.class)
 public class GameApplication {
 
 	@Value("${server.domain}")

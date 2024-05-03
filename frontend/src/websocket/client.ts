@@ -6,9 +6,9 @@ let stompClient: Stomp.Client;
 export const handshake = () => {
     stompClient = new Client({
         brokerURL: `${import.meta.env.VITE_REACT_WEBSOCKET_URL}`,
-        debug: function (str: any) {
-            console.log(str);
-        },
+        // debug: function (str: any) {
+        //     console.log(str);
+        // },
         reconnectDelay: 5000,
     });
 

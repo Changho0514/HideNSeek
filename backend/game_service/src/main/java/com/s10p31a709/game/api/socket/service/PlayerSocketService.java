@@ -4,6 +4,7 @@ import com.s10p31a709.game.api.room.entity.Player;
 import com.s10p31a709.game.api.room.entity.Room;
 import com.s10p31a709.game.api.room.repository.RoomRepository;
 import com.s10p31a709.game.api.socket.model.StompPayload;
+import com.s10p31a709.game.common.config.GameProperties;
 import com.s10p31a709.game.common.feign.service.MemberServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class PlayerSocketService {
     private final RoomRepository roomRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final MemberServiceClient memberServiceClient;
+    private final GameProperties gameProperties;
 
     public void exitPlayer(String sessionId){
         Player player = roomRepository.findPlayerBySessionId(sessionId);
@@ -74,9 +76,10 @@ public class PlayerSocketService {
         simpMessagingTemplate.convertAndSend("/sub/room/"+message.getRoomId(), payload);
     }
 
-    public void choosePlayer(StompPayload<Player> message) {
-        int[] arr = new int[]{new Random().nextInt(20), new Random().nextInt(20), new Random().nextInt(20)};
-        StompPayload<int[]> payload = new StompPayload<>("player.choose", message.getRoomId(), "system", arr);
-        simpMessagingTemplate.convertAndSend("/sub/room/"+message.getRoomId(), payload);
+    public void choosePlayer(String roomId) {
+        int maxIdx = gameProperties.getObject().getMaxHiderIdx();
+        int[] arr = new int[]{new Random().nextInt(maxIdx), new Random().nextInt(maxIdx), new Random().nextInt(maxIdx)};
+        StompPayload<int[]> payload = new StompPayload<>("player.choose", roomId, "system", arr);
+        simpMessagingTemplate.convertAndSend("/sub/room/"+roomId, payload);
     }
 }

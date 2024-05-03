@@ -8,7 +8,7 @@
         <topic>game-server-logs</topic>
 <!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>-->
         <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
-        <producerConfig>bootstrap.servers=localhost:19092</producerConfig>
+        <producerConfig>bootstrap.servers=k10a709.p.ssafy.io:19092</producerConfig>
     </appender>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

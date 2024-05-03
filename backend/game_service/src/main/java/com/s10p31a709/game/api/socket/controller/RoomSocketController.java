@@ -6,6 +6,7 @@ import com.s10p31a709.game.api.socket.service.RoomSocketService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "RoomSocketController", description = "Room 객체가 수정되는 socket 요청 (swagger 에서 테스트 불가)")
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 public class RoomSocketController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -26,12 +28,14 @@ public class RoomSocketController {
     @MessageMapping("/room") @DeleteMapping("/room")
     @Operation(summary = "범용적 테스트용", description = "받은 payload 를 그대로 방 사람들에게 전달한다. roomState: {0:대기, 1:로딩, 2:게임중(숨기), 3: 게임중(찾기), 4:찾는팀승 5:숨는팀승}")
     public void roomBaseMessage(@Payload StompPayload<Room> message) {
+        log.info(message.toString());
         simpMessagingTemplate.convertAndSend("/sub/room/"+message.getRoomId(), message);
     }
 
     @MessageMapping("/room.modify") @DeleteMapping("/room.modify")
     @Operation(summary = "방 정보 수정(클라 요청 필요)", description = "title, password, public, time, map 을 수정")
     public void roomModify(@Payload StompPayload<Room> message){
+        log.info(message.toString());
         roomSocketService.modifyRoom(message);
     }
 
@@ -44,6 +48,7 @@ public class RoomSocketController {
     @MessageMapping("/room.gameInit") @DeleteMapping("/room.gameInit")
     @Operation(summary = "게임 입장(클라 요청 필요)", description = "요청만 보내주면 Players(술래여부, 생존여부, 초기위치, 방향)를 포함한 Room객체(시간:10, 룸상태:1)")
     public void gameInit(@Payload StompPayload<Room> message){
+        log.info(message.toString());
         roomSocketService.gameInit(message);
     }
 

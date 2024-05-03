@@ -15,11 +15,16 @@ spring:
     livereload:
       enabled: true
   datasource:
+#    hikari:
+#      driver-class-name: org.mariadb.jdbc.Driver
+#      username: S10P31A709
+#      password: 2xAVwVzvO7
+#    url: jdbc:mariadb://stg-yswa-kr-practice-db-master.mariadb.database.azure.com:3306/S10P31A709?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
     hikari:
       driver-class-name: org.mariadb.jdbc.Driver
-      username: S10P31A709
-      password: 2xAVwVzvO7
-    url: jdbc:mariadb://stg-yswa-kr-practice-db-master.mariadb.database.azure.com:3306/S10P31A709?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+      username: bum
+      password: 12rlawhdqja!21
+    url: jdbc:mariadb://database.cfsgaygiae4v.ap-northeast-2.rds.amazonaws.com:3306/s10p31a709
 
   # jpa
   jpa:

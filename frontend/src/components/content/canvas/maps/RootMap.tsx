@@ -1,21 +1,16 @@
-import { useRecoilValue } from 'recoil';
 import { GroundElements } from './structures/ground';
-import { SelectedCharacterGlbNameIndexAtom } from '../../../../store/PlayersAtom';
 import { useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { Vector3 } from 'three';
-import { Player } from './player/Player';
-import { ObjectPlayer } from './player/ObjectPlayer';
 import { AttackRules } from './player/AttackRules';
 import { useSelector } from 'react-redux';
 import { CurrentPlayersInfo } from '../../../../types/GameType';
+import { Animal } from './player/Animal';
+import { ObjectPlayer } from './player/ObjectPlayer';
 
 export function RootMap() {
     const camera = useThree((three) => three.camera);
     const controls = useRef<any>(null);
-    const selectedCharacterGlbNameIndex = useRecoilValue(
-        SelectedCharacterGlbNameIndexAtom
-    );
 
     const currentRoom = useSelector(
         (state: any) => state.reduxFlag.userSlice.currentRoom
@@ -34,7 +29,7 @@ export function RootMap() {
                     if (player.isSeeker && !player.isDead) {
                         return (
                             <>
-                                <Player
+                                {/* <Player
                                     key={player.id}
                                     player={player}
                                     position={
@@ -45,6 +40,21 @@ export function RootMap() {
                                         )
                                     }
                                     modelIndex={selectedCharacterGlbNameIndex}
+                                /> */}
+                                <Animal
+                                    player={player}
+                                    position={
+                                        new Vector3(
+                                            player.position[0],
+                                            player.position[1],
+                                            player.position[2]
+                                        )
+                                    }
+                                    modelIndex={
+                                        player.selectedIndex
+                                            ? player.selectedIndex
+                                            : 0
+                                    }
                                 />
                             </>
                         );

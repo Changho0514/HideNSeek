@@ -73,7 +73,7 @@ export function AttackRules() {
                                 },
                             })
                         );
-                        item.isDead = true;
+                        // item.isDead = true;
                     }
                 });
                 // closestObject.parent?.name 지준영

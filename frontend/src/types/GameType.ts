@@ -58,3 +58,11 @@ export interface EnterRoomState {
     roomPassword?: string;
     nickname: string;
 }
+export interface CollideObject {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+    minZ: number;
+    maxZ: number;
+}

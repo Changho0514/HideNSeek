@@ -16,7 +16,7 @@
         <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
         <!-- <producerConfig> Kafka producer의 설정값 (순서대로, 재전송 횟수, 전송 서버 주소, 압축 타입, 데이터 전송 최대 대기 시간  -->
         <producerConfig>retries=1</producerConfig>
-        <producerConfig>bootstrap.servers=localhost:19092</producerConfig>
+        <producerConfig>bootstrap.servers=k10a709.p.ssafy.io:19092</producerConfig>
         <producerConfig>compression.type=snappy</producerConfig>
         <producerConfig>max.block.ms=1000</producerConfig>
     </appender>
@@ -47,7 +47,7 @@
         <topic>test-server-logs</topic>
 <!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>-->
         <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
-        <producerConfig>bootstrap.servers=localhost:19092</producerConfig>
+        <producerConfig>bootstrap.servers=k10a709.p.ssafy.io:19092</producerConfig>
     </appender>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

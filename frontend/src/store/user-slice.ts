@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { CurrentPlayersInfo, RoomInfo } from '../types/GameType';
+import { CollideObject, CurrentPlayersInfo, RoomInfo } from '../types/GameType';
 
 export interface UserState {
     //닉네임
@@ -8,6 +8,8 @@ export interface UserState {
     isReady: boolean;
     currentRoom: RoomInfo;
     meInfo: CurrentPlayersInfo;
+    givenChoice: number[];
+    collideObj: CollideObject[];
 }
 const initialState: UserState = {
     userNickname: '',
@@ -32,6 +34,8 @@ const initialState: UserState = {
         isDead: null,
         isSeeker: null,
     },
+    givenChoice: [],
+    collideObj: [],
 };
 
 export const userSlice = createSlice({
@@ -71,6 +75,18 @@ export const userSlice = createSlice({
         meSelectedInfoState: (state, action) => {
             state.meInfo.selectedIndex = action.payload;
         },
+        givenChoiceState: (state, action) => {
+            state.givenChoice = action.payload;
+        },
+        addCollideObjectState: (state, action) => {
+            state.collideObj = [...state.collideObj, action.payload];
+        },
+        removeCollideObjectState: (state, action) => {
+            // action.payload에 해당하는 인덱스의 객체를 제거
+            state.collideObj = state.collideObj.filter(
+                (_item, index) => index !== action.payload
+            );
+        },
     },
 });
 export const {
@@ -82,5 +98,8 @@ export const {
     addPeopleRoomState,
     meSelectedInfoState,
     removePeopleRoomState,
+    givenChoiceState,
+    addCollideObjectState,
+    removeCollideObjectState,
 } = userSlice.actions;
 export default userSlice.reducer;

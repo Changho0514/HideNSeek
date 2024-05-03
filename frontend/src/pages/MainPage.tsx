@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
     currentRoomState,
+    givenChoiceState,
     readyState,
     roomIdState,
     userNicknameState,
@@ -24,6 +25,7 @@ export default function MainPage() {
             roomTitle: '',
         })
     );
+    dispatch(givenChoiceState(''));
 
     return (
         <section
