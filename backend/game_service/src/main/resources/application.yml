@@ -1,20 +1,29 @@
 server:
   port: 8002
-  domain: https://k10a709.p.ssafy.io
+  domain: ${SERVER_DOMAIN:https://k10a709.p.ssafy.io}
   servlet:
     contextPath: "/api/game-service"
     encoding:
       charset: UTF-8
       enabled: true
       force: true
-
+  count: 4
 spring:
   application:
     name: game-service
   devtools:
     livereload:
       enabled: true
-
+  kafka:
+    bootstrap-servers: k10a709.p.ssafy.io:19092
+  elasticsearch:
+    uris: http://k10a709.p.ssafy.io:9200
+  # redis 추가 설정
+#  data:
+#    redis:
+#      host: redis-master.redis.svc.cluster.local
+#      port: 6379
+#      password: pass
 #logging
 logging:
   level:
@@ -28,12 +37,19 @@ logging:
 
 game:
   time:
-    waiting: 10
+    waiting: 3
     hide: 30
-    seek: 90
+    seek: 120
     result: 10
-  maxCapacity: 6
-  object:
+  maxCapacity: 12
+  richRoom:
     maxSeekerIdx: 14
-    maxHiderIdx: 20
-  fps: 20
+    maxHiderIdx: 101
+    startPoint: -43.8823, 0.03, -27.9526
+    maxMapValue: 1
+  farm:
+    maxSeekerIdx: 14
+    maxHiderIdx: 49
+    startPoint: 0.0, 0.03, 0.0
+    maxMapValue: 100
+  fps: 30

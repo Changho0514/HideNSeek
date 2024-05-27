@@ -7,6 +7,7 @@ import com.s10p31a709.member.service.GameServiceClient;
 import com.s10p31a709.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -29,6 +31,7 @@ public class MemberController {
     @PostMapping("/guest")
     @Operation(summary = "게스트 로그인", description = "nickname 을 보내주면 중복여부 확인")
     public ResponseEntity<?> guestLogin(@RequestBody Member member){
+        log.info("guestLogin: {}", member);
         return BaseResponse.success(200, "로그인 성공", memberService.guestLogin(member.getNickname()));
     }
 
@@ -55,6 +58,7 @@ public class MemberController {
     @Operation(summary = "게스트 로그아웃")
     public ResponseEntity<?> deleteGuest(@PathVariable String nickname){
         memberService.deleteGuest(nickname);
+        log.info("guestLogin: {}", nickname);
         return BaseResponse.success(200, "삭제 성공");
     }
 
@@ -62,8 +66,14 @@ public class MemberController {
     @Operation(summary = "채널 목록 반환")
     public ResponseEntity<?> channelList(){
         List<Channel> list = new ArrayList<>();
-        list.add(gameServiceClient.channelInfo().getData());
+        list.add(gameServiceClient.channelInfo());
         return BaseResponse.success(200, "채널 목록 반환 성공", list);
+    }
+
+    @GetMapping("/heartbeat/{nickname}")
+    @Operation(summary = "heartbeat")
+    public void heartbeat(@PathVariable("nickname") String nickname){
+        memberService.heartbeat(nickname);
     }
 
 }

@@ -3,6 +3,7 @@ package com.s10p31a709.member.service;
 import com.s10p31a709.member.common.response.BaseResponse;
 import com.s10p31a709.member.entity.Channel;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface GameServiceClient {
 
     @GetMapping("/rooms/channel")
-    BaseResponse<Channel> channelInfo();
+    Channel channelInfo();
+
+    @DeleteMapping("rooms/player/{nickname}")
+    void deletePlayer(@PathVariable("nickname") String nickname);
+
+    // @GetMapping("ch/{channelId}/rooms/channel")
+    // Channel channelInfoKube(@PathVariable("channelId") int channelId);
 
 }

@@ -4,8 +4,10 @@
 
 #root {
     background-color: antiquewhite;
-    width: 1536px;
-    height: 864px;
+    width: 100vw;
+    height: 100vh;
+    /* width: 1536px;
+    height: 864px; */
     margin: 0 auto;
     text-align: center;
     overflow-x: hidden;

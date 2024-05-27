@@ -1,8 +1,16 @@
+import { useSelector } from 'react-redux';
 import { BarElement } from './sets/BarElement';
 import { BarFloor } from './sets/BarFloor';
 import BarWall from './sets/BarWall';
+import { FarmElement } from './sets/FarmElement';
+import { FarmWall } from './sets/FarmWall';
+import { FarmFloor } from './sets/FarmFloor';
 
 export function GroundElements() {
+    const currentRoom = useSelector(
+        (state: any) => state.reduxFlag.userSlice.currentRoom
+    );
+    // console.log(currentRoom.roomMap);
     return (
         <>
             {/* <JungleGym />
@@ -15,9 +23,19 @@ export function GroundElements() {
             <PineTrees position={[-30, 0, -20]} />
             <PineTrees position={[-20, 0, -20]} /> */}
             {/* <Floor /> */}
-            <BarFloor />
-            <BarWall />
-            <BarElement />
+            {currentRoom.roomMap === 'farm' ? (
+                <>
+                    <FarmElement />
+                    <FarmWall />
+                    <FarmFloor />
+                </>
+            ) : (
+                <>
+                    <BarFloor />
+                    <BarWall />
+                    <BarElement />
+                </>
+            )}
         </>
     );
 }

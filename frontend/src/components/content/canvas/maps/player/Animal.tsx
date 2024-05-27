@@ -12,6 +12,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useDispatch } from 'react-redux';
 import { addCollideObjectState } from '../../../../../store/user-slice';
+import { NicknameBoard } from '../structures/ground/3DUIs/NicknameBoard';
 
 export function Animal({ player, position, modelIndex: mIdx }: PlayerInitType) {
     const dispatch = useDispatch();
@@ -23,12 +24,12 @@ export function Animal({ player, position, modelIndex: mIdx }: PlayerInitType) {
             type: 'Kinematic',
             position: [0, 0, 0], // 초기 위치를 useRef의 현재 값으로 설정
             onCollide: (e) => {
-                console.log('충돌', e);
+                // console.log('충돌', e);
                 if (playerRef.current) {
                     const bounds = calculateBoundingBox(e.body);
-                    console.log(`X 좌표 범위: ${bounds.minX} ~ ${bounds.maxX}`);
-                    console.log(`Y 좌표 범위: ${bounds.minY} ~ ${bounds.maxY}`);
-                    console.log(`Z 좌표 범위: ${bounds.minZ} ~ ${bounds.maxZ}`);
+                    // console.log(`X 좌표 범위: ${bounds.minX} ~ ${bounds.maxX}`);
+                    // console.log(`Y 좌표 범위: ${bounds.minY} ~ ${bounds.maxY}`);
+                    // console.log(`Z 좌표 범위: ${bounds.minZ} ~ ${bounds.maxZ}`);
                     dispatch(addCollideObjectState(bounds));
                 } else {
                     console.log('메쉬 정보가 없습니다.');
@@ -38,11 +39,13 @@ export function Animal({ player, position, modelIndex: mIdx }: PlayerInitType) {
         useRef(null)
     );
     const {
+        meInfo,
         playerRef,
         memoizedPosition,
         playerNickname,
         nodes,
         material,
+        nicknameRef,
         // ref,
     } = useAnimal({
         player,
@@ -73,6 +76,10 @@ export function Animal({ player, position, modelIndex: mIdx }: PlayerInitType) {
     }
 
     return (
+        <>  
+        {meInfo && (
+                <NicknameBoard ref={nicknameRef} text={`${player?.nickname}`} />
+        )}
         <group
             ref={playerRef}
             position={memoizedPosition}
@@ -91,6 +98,7 @@ export function Animal({ player, position, modelIndex: mIdx }: PlayerInitType) {
                 </group>
             </group>
         </group>
+        </>
     );
 }
 

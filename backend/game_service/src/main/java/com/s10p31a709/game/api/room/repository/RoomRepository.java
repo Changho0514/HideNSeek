@@ -68,7 +68,7 @@ public class RoomRepository {
         for (Room room : rooms) {
             for (int i = 0; i < room.getRoomPlayers().size(); i++) {
                 Player player = room.getRoomPlayers().get(i);
-                if (player.getSessionId().equals(sessionId)) {
+                if (player.getSessionId() != null && player.getSessionId().equals(sessionId)) {
                     return player;
                 }
             }

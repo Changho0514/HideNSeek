@@ -1,0 +1,18 @@
+FROM node:18.19.0 as builder
+WORKDIR /app
+ARG ENV_FILE=./kube/.env
+COPY package*.json .
+RUN npm ci
+COPY . .
+COPY $ENV_FILE ./
+RUN ls -al
+RUN cat .env
+RUN npm run build
+
+FROM nginx:latest
+WORKDIR /usr/share/nginx/statics
+RUN rm /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/conf.d
+COPY --from=builder /app/dist .
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

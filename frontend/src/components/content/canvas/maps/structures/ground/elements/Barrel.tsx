@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Barrel(props: ObjectSettingType) {
+function BarrelComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Barrel.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [4, 4, 4],
+        args: [1.5, 1.5, 1.6],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -31,7 +32,7 @@ export function Barrel(props: ObjectSettingType) {
         angularFactor: [0, 0, 0], // 모든 축에 대해 회전 제한
     }));
     return (
-        <group dispose={null}>
+        <group position={[0, 0.6, 0]} dispose={null}>
             <mesh
                 ref={ref}
                 geometry={nodes.Barrel_1.geometry}
@@ -45,3 +46,13 @@ export function Barrel(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Barrel.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+  }
+  
+export const Barrel = React.memo(BarrelComponent, areEqual);

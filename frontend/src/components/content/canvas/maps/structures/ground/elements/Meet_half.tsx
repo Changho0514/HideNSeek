@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,7 +19,7 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Meet_half(props: ObjectSettingType) {
+function Meet_halfComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Meet_half.glb'
     ) as GLTFResult;
@@ -45,3 +46,13 @@ export function Meet_half(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Meet_half.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+export const Meet_half = React.memo(Meet_halfComponent, areEqual);

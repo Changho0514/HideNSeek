@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Meet_full(props: ObjectSettingType) {
+function Meet_fullComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Meet_full.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [2, 2, 1],
+        args: [2, 1, 0.8],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -45,3 +46,13 @@ export function Meet_full(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Meet_full.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+export const Meet_full = React.memo(Meet_fullComponent, areEqual);

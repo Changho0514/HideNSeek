@@ -13,7 +13,6 @@ import { GLTF, SkeletonUtils } from 'three-stdlib';
 import { PlayerInitType } from '../../../../../../types/GameType';
 import { useRecoilValue } from 'recoil';
 import { MeAtom } from '../../../../../../store/PlayersAtom';
-import { socket } from '../../../../../../sockets/clientSocket';
 
 interface GLTFAction extends AnimationClip {
     name: ActionName;
@@ -115,9 +114,9 @@ export const usePlayer = ({ player, position, modelIndex }: PlayerInitType) => {
 
     useFrame(({ camera }) => {
         const moveVector = new Vector3(
-            (keyState.current['d'] ? 1 : 0) - (keyState.current['a'] ? 1 : 0),
+            (keyState.current['d']||keyState.current['D']||keyState.current['ㅇ'] ? 1 : 0) - (keyState.current['a']||keyState.current['A']||keyState.current['ㅁ'] ? 1 : 0),
             0,
-            (keyState.current['s'] ? 1 : 0) - (keyState.current['w'] ? 1 : 0)
+            (keyState.current['s']||keyState.current['S']||keyState.current['ㄴ'] ? 1 : 0) - (keyState.current['w']||keyState.current['W']||keyState.current['ㅈ'] ? 1 : 0)
         );
         if (!moveVector.equals(new Vector3(0, 0, 0))) {
             moveVector.normalize().multiplyScalar(0.2);
@@ -125,20 +124,7 @@ export const usePlayer = ({ player, position, modelIndex }: PlayerInitType) => {
             setAnimation(
                 'CharacterArmature|CharacterArmature|CharacterArmature|Run'
             );
-            console.log(moveVector);
-
-            if (playerRef.current) {
-                playerRef.current.position.add(moveVector);
-                socket.emit('move', [
-                    playerRef.current.position.x,
-                    0,
-                    playerRef.current.position.z,
-                ]);
-                playerRef.current.rotation.y = Math.atan2(
-                    moveVector.x,
-                    moveVector.z
-                );
-            }
+            // console.log(moveVector);
         } else {
             setIsWalking(false);
             setAnimation(

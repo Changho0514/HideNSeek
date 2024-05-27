@@ -72,13 +72,6 @@ public class PlayerSocketController {
         playerSocketService.deadPlayer(message);
     }
 
-    @MessageMapping("/player.choose") @DeleteMapping("/player.choose")
-    @Operation(summary = "Object 선택", description = "0~19까지의 숫자중 3개 배열 리턴")
-    public void playerChoose(@Payload StompPayload<Player> message) {
-        log.info(message.toString());
-        playerSocketService.choosePlayer(message.getRoomId());
-    }
-
     @MessageMapping("/player.fix") @DeleteMapping("/player.fix")
     @Operation(summary = "숨는 장소 기록", description = "log를 남기기위한 목적")
     public void playerFix(@Payload StompPayload<Player> message) {

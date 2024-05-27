@@ -1,5 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { CollideObject, CurrentPlayersInfo, RoomInfo } from '../types/GameType';
+import {
+    ChatType,
+    CollideObject,
+    CurrentPlayersInfo,
+    MapSize,
+    RoomInfo,
+} from '../types/GameType';
+import { Vector3 } from 'three'
 
 export interface UserState {
     //닉네임
@@ -8,8 +15,17 @@ export interface UserState {
     isReady: boolean;
     currentRoom: RoomInfo;
     meInfo: CurrentPlayersInfo;
-    givenChoice: number[];
     collideObj: CollideObject[];
+    meHeart: number;
+    bgmFlag: boolean;
+    mapSize: MapSize;
+    chatData: ChatType[];
+    chatFlag: boolean;
+    channelIndex: number;
+    rerollTime: number; 
+    observserMode: boolean;
+    observer: string;
+    cameraPosition: Vector3;
 }
 const initialState: UserState = {
     userNickname: '',
@@ -25,6 +41,8 @@ const initialState: UserState = {
         roomState: null,
         roomTime: null,
         roomTitle: '',
+        botCnt: 0,
+        mapValue: null,
     },
     meInfo: {
         nickname: '',
@@ -32,10 +50,26 @@ const initialState: UserState = {
         position: [0, 0, 0],
         direction: [0, 0, 0],
         isDead: null,
-        isSeeker: null,
+        isSeeker: null, 
     },
-    givenChoice: [],
     collideObj: [],
+    meHeart: 0,
+    bgmFlag: true,
+    mapSize: {
+        minX: -100,
+        maxX: 100,
+        minZ: -100,
+        maxZ: 100,
+        minY: -1,
+        maxY: 8,
+    },
+    chatData: [], 
+    observer: '',
+    observserMode: false, 
+    chatFlag: false,
+    channelIndex :1,
+    rerollTime: 0,
+    cameraPosition : new Vector3(0,0,0),
 };
 
 export const userSlice = createSlice({
@@ -69,26 +103,87 @@ export const userSlice = createSlice({
                 ),
             };
         },
+        deadPeopleState: (state, action) => {
+            state.currentRoom = {
+                ...state.currentRoom,
+                roomPlayers: state.currentRoom.roomPlayers.map(
+                    (player, index) => {
+                        if (index === action.payload) {
+                            // 해당 인덱스의 플레이어의 isDead 값을 true로 설정
+                            return { ...player, isDead: true };
+                        }
+                        return player; // 다른 플레이어는 그대로 유지
+                    }
+                ),
+            };
+        },
         meInfoState: (state, action) => {
             state.meInfo = action.payload;
         },
         meSelectedInfoState: (state, action) => {
             state.meInfo.selectedIndex = action.payload;
         },
-        givenChoiceState: (state, action) => {
-            state.givenChoice = action.payload;
+        heartState: (state, action) => {
+            state.meHeart = action.payload;
         },
+        decrementHeartState: (state) => {
+            state.meHeart -= 1;
+        },
+        meDead: (state, action) => {
+            state.meInfo.isDead = action.payload;
+        }, 
         collideObjectState: (state, action) => {
             state.collideObj = action.payload;
         },
         addCollideObjectState: (state, action) => {
-            state.collideObj = [...state.collideObj, action.payload];
+            const isExisting = state.collideObj.some(
+                (obj) =>
+                    obj.minX === action.payload.minX &&
+                    obj.maxX === action.payload.maxX &&
+                    obj.minY === action.payload.minY &&
+                    obj.maxY === action.payload.maxY &&
+                    obj.minZ === action.payload.minZ &&
+                    obj.maxZ === action.payload.maxZ
+            );
+            if (!isExisting) {
+                state.collideObj = [...state.collideObj, action.payload];
+            }
         },
         removeCollideObjectState: (state, action) => {
             // action.payload에 해당하는 인덱스의 객체를 제거
             state.collideObj = state.collideObj.filter(
                 (_item, index) => index !== action.payload
             );
+        },
+        bgmFlagState: (state, action) => {
+            state.bgmFlag = action.payload;
+        },
+        mapSizeState: (state, action) => {
+            state.mapSize = action.payload;
+        },
+        chatDataState: (state, action) => {
+            state.chatData = action.payload;
+        },
+        addChatDataState: (state, action) => {
+            state.chatData = [...state.chatData, action.payload];
+        }, 
+        observerState: (state, action) => {
+            state.observer = action.payload;
+        },  
+        chatFlagState: (state, action) => {
+            state.chatFlag = action.payload;
+        },
+        rerollState: (state, action) => {
+            state.rerollTime = action.payload;
+        }, 
+        observserModeState: (state, action) => {
+            state.observserMode = action.payload; 
+        },
+        channelIndexState: (state, action) => {
+            state.channelIndex = action.payload; 
+        },
+        cameraPositionState: (state, action) => {
+            state.cameraPosition = action.payload; 
         },
     },
 });
@@ -100,10 +195,23 @@ export const {
     meInfoState,
     addPeopleRoomState,
     meSelectedInfoState,
+    meDead,
     removePeopleRoomState,
-    givenChoiceState,
     addCollideObjectState,
     removeCollideObjectState,
     collideObjectState,
+    heartState,
+    decrementHeartState,
+    bgmFlagState,
+    mapSizeState,
+    chatDataState,
+    addChatDataState, 
+    observerState,  
+    chatFlagState,
+    deadPeopleState,
+    rerollState, 
+    observserModeState, 
+    channelIndexState, 
+    cameraPositionState,
 } = userSlice.actions;
 export default userSlice.reducer;

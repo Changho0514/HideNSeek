@@ -10,7 +10,7 @@ export default function localAxios() {
             accept: 'application/json',
         },
         //쿠키 보내주도록 설정
-        withCredentials: true,
+        withCredentials: false,
     });
 
     return instance;

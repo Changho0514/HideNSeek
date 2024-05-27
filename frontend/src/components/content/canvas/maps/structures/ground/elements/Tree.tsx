@@ -3,12 +3,12 @@ import { useGLTF } from '@react-three/drei';
 import { useEffect, useMemo } from 'react';
 import { Mesh } from 'three';
 import { SkeletonUtils } from 'three-stdlib';
-
+import React from 'react';
 const name = 'ground-tree';
 interface ObjectType {
     position: number[];
 }
-export function Tree({ position }: ObjectType) {
+function TreeComponent({ position }: ObjectType) {
     const { scene: scene_ } = useGLTF('/models/Tree.glb');
     const scene = useMemo(() => {
         return SkeletonUtils.clone(scene_);
@@ -38,3 +38,16 @@ export function Tree({ position }: ObjectType) {
         ></primitive>
     );
 }
+
+useGLTF.preload('/models/Tree.glb');
+
+function areEqual(prevProps: ObjectType, nextProps: ObjectType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+export default React.memo(TreeComponent, areEqual);
+

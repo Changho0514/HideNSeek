@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Chair_brown(props: ObjectSettingType) {
+function Chair_brownComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Chair_brown.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [2, 2, 3],
+        args: [1.4, 1.4, 1.4],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -31,7 +32,7 @@ export function Chair_brown(props: ObjectSettingType) {
         angularFactor: [0, 0, 0], // 모든 축에 대해 회전 제한
     }));
     return (
-        <group position={[0, -1.5, 0]} dispose={null}>
+        <group position={[0, -0.8, 0]} dispose={null}>
             <mesh
                 ref={ref}
                 geometry={nodes.Chair_11.geometry}
@@ -45,3 +46,13 @@ export function Chair_brown(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Chair_brown.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+  }
+  
+  export const Chair_brown = React.memo(Chair_brownComponent, areEqual);

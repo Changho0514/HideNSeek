@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
-import '/src/assets/css/common.css';
-import '/src/assets/css/variables.css';
+import './assets/css/common.css';
+import './assets/css/variables.css';
 import MainPage from './pages/MainPage.tsx';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import SelectChannelPage from './pages/SelectChannelPage.tsx';
@@ -9,6 +9,7 @@ import RoomPage from './pages/RoomPage.tsx';
 import GamePage from './pages/GamePage.tsx';
 import GuestLoginPage from './pages/GuestLoginPage.tsx';
 import UserLoginPage from './pages/UserLoginPage.tsx';
+import Heartbeat from './pages/Heartbeat.tsx';
 import { persistor, store } from './store/store.ts';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
@@ -16,6 +17,7 @@ import { Provider } from 'react-redux';
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
+            <Heartbeat />
             <BrowserRouter>
                 <Routes>
                     <Route index element={<MainPage />}></Route>

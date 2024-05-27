@@ -39,6 +39,8 @@ export interface RoomInfo {
     roomState: number | null;
     roomTime: number | null;
     roomTitle: string;
+    botCnt: number | null;
+    mapValue: number | null,
 }
 
 export interface GuestLoginInfo {
@@ -70,4 +72,24 @@ export interface CollideObject {
 export interface ObjectSettingType {
     position: Triplet;
     rotation?: Triplet;
+    scale?: Triplet;
+}
+
+export interface MapSize {
+    minX: number;
+    maxX: number;
+    minZ: number;
+    maxZ: number;
+    minY: number;
+    maxY: number;
+}
+export interface ChatType {
+    nickname: string;
+    content: string;
+}
+
+export interface ThumbnailType {
+    index: number;
+    thumbnail: string;
+    name: string;
 }

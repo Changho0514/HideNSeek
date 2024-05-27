@@ -36,6 +36,9 @@ dependencies {
 	// openFeign
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+	// elasticsearch 데이터 조회
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
 	// kafka 관련 설정
 	implementation 'org.springframework.kafka:spring-kafka'
 
@@ -44,6 +47,7 @@ dependencies {
 
 	// Logstash에서 처리할 수 있는 JSON 형식으로 로그 메시지를 인코딩
 	implementation 'net.logstash.logback:logstash-logback-encoder:6.2'
+
 }
 
 dependencyManagement {

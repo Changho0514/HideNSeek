@@ -8,7 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { useBox } from '@react-three/cannon';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
-
+import React from 'react';
 type GLTFResult = GLTF & {
     nodes: {
         Table_13: THREE.Mesh;
@@ -18,7 +18,7 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function RoundTable_brown(props: ObjectSettingType) {
+function RoundTable_brownComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/RoundTable_brown.glb'
     ) as GLTFResult;
@@ -46,3 +46,13 @@ export function RoundTable_brown(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/RoundTable_brown.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+export const RoundTable_brown = React.memo(RoundTable_brownComponent, areEqual);

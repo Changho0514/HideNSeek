@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,14 +61,21 @@ public class RoomController {
 
     @GetMapping("/channel")
     @Operation(summary = "현재 채널의 이름(name), 사람수(count), 주소(address) 반환")
-    public ResponseEntity<?> channelInfo(){
+    public Channel channelInfo(){
         List<Room> list = roomService.getRoomList();
         int cnt = 0;
         for (Room room : list){
-            cnt += room.getRoomPlayers().size();
+            cnt += room.getRoomPlayers().stream().filter(player -> !player.getNickname().startsWith("Computer")).collect(Collectors.toList()).size();
         }
 
-        return BaseResponse.success(200, "채널정보 반환 성공", new Channel(applicationName, cnt, contextPath));
+        return new Channel(applicationName, cnt, contextPath);
+    }
+
+    @DeleteMapping("/player/{nickname}")
+    @Operation(summary = "해당 멤버 방에서 삭제")
+    public ResponseEntity<?> deletePlayer(@PathVariable("nickname") String nickname){
+        roomService.deletePlayer(nickname);
+        return BaseResponse.success(200, "멤버 삭제 성공");
     }
 
 

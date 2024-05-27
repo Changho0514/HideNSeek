@@ -7,7 +7,6 @@ import {
     TextureLoader,
 } from 'three';
 import { groundMapSize } from '../../../../../../../data/constant';
-import { socket } from '../../../../../../../sockets/clientSocket';
 import { useBox } from '@react-three/cannon';
 
 export function Floor() {
@@ -33,9 +32,6 @@ export function Floor() {
             receiveShadow
             rotation={[-Math.PI / 2, 0, 0]}
             position-y={-0.001}
-            onPointerUp={(e) => {
-                socket.emit('move', [e.point.x, 0, e.point.z]);
-            }}
         >
             <primitive object={geometry} attach="geometry" />
             <meshStandardMaterial map={sandTexture} />

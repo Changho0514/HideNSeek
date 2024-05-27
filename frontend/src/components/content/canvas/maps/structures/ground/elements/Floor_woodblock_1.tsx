@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -19,7 +20,7 @@ type GLTFResult = GLTF & {
     animations: any[];
 };
 
-export function Floor_woodblock_1(props: ObjectSettingType) {
+function Floor_woodblock_1Component(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Floor_woodblock_1.glb'
     ) as GLTFResult;
@@ -49,3 +50,13 @@ export function Floor_woodblock_1(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Floor_woodblock_1.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+export const Floor_woodblock_1 = React.memo(Floor_woodblock_1Component, areEqual);

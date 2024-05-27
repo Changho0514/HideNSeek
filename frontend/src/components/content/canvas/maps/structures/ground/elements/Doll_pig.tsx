@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Doll_pig(props: ObjectSettingType) {
+function Doll_pigComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Doll_pig.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [1.4, 1.8, 1.4],
+        args: [1.1, 1.8, 1.1],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -45,3 +46,13 @@ export function Doll_pig(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Doll_pig.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+  }
+  
+export const Doll_pig= React.memo(Doll_pigComponent, areEqual);

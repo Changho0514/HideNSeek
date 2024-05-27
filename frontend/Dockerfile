@@ -1,4 +1,4 @@
-FROM node:20 as builder
+FROM node:18.19.0 as builder
 WORKDIR /app
 ENV REACT_APP_ALLOW ALLOW
 COPY package*.json .

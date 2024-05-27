@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Refrigerator(props: ObjectSettingType) {
+function RefrigeratorComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Refrigerator.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [4, 4, 4],
+        args: [3, 2, 5.2],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -31,7 +32,7 @@ export function Refrigerator(props: ObjectSettingType) {
         angularFactor: [0, 0, 0], // 모든 축에 대해 회전 제한
     }));
     return (
-        <group dispose={null}>
+        <group position={[0, -2.7, 0]} dispose={null}>
             <mesh
                 ref={ref}
                 geometry={nodes.Fridge_2.geometry}
@@ -45,3 +46,13 @@ export function Refrigerator(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Refrigerator.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+export const Refrigerator = React.memo(RefrigeratorComponent, areEqual);

@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function LongTable_white(props: ObjectSettingType) {
+function LongTable_whiteComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/LongTable_white.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [6, 4, 2],
+        args: [6, 3.3, 2],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -45,3 +46,13 @@ export function LongTable_white(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/LongTable_white.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+export const LongTable_white = React.memo(LongTable_whiteComponent, areEqual);

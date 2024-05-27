@@ -1,2 +1,6 @@
 server:
   port: 2024
+
+spring:
+  kafka:
+    bootstrap-servers: k10a709.p.ssafy.io:19092

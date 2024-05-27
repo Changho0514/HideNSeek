@@ -14,7 +14,7 @@ export default function WebSocket(props: Prop) {
     //websocket
     //websocketId 받아오기 -> handshake
     useEffect(() => {
-        const client = handshake();
+        const client = handshake("1");
         // console.log('websocketId : ' + id);
         client.onConnect = () => {
             //public subscribe

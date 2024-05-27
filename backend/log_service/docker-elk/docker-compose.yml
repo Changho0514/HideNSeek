@@ -14,7 +14,7 @@ services:
       - ./setup/lib.sh:/lib.sh:ro,Z
       - ./setup/roles:/roles:ro,Z
       - ./delete-kafka-log-meta-data.sh:/delete-kafka-log-meta-data.sh
-#    entrypoint: ["delete-kafka-log-meta-data.sh"]
+    #    entrypoint: ["delete-kafka-log-meta-data.sh"]
     environment:
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD}
@@ -112,17 +112,17 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      JMX_PORT: 9093
-      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${EXPOSED_HOSTNAME} -Dcom.sun.management.jmxremote.rmi.port=9093
+#      JMX_PORT: 9093
+#      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${EXPOSED_HOSTNAME} -Dcom.sun.management.jmxremote.rmi.port=9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://${EXPOSED_HOSTNAME}:19092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-#      KAFKA_LOG_DIRS: /kafka
-#      KAFKA_CREATE_TOPICS: "ek-log:10:3"
+    #      KAFKA_LOG_DIRS: /kafka
+    #      KAFKA_CREATE_TOPICS: "ek-log:10:3"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-#      - ./kafka/logs/1:/kafka
+    #      - ./kafka/logs/1:/kafka
     networks:
       - elk
 
@@ -136,17 +136,17 @@ services:
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      JMX_PORT: 9093
-      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${EXPOSED_HOSTNAME} -Dcom.sun.management.jmxremote.rmi.port=9093
+#      JMX_PORT: 9093
+#      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${EXPOSED_HOSTNAME} -Dcom.sun.management.jmxremote.rmi.port=9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092,PLAINTEXT_HOST://${EXPOSED_HOSTNAME}:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-#      KAFKA_LOG_DIRS: /kafka
+    #      KAFKA_LOG_DIRS: /kafka
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-#      - ./kafka/logs/2:/kafka
+    #      - ./kafka/logs/2:/kafka
     networks:
       - elk
 
@@ -160,16 +160,16 @@ services:
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      JMX_PORT: 9093
-      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${EXPOSED_HOSTNAME} -Dcom.sun.management.jmxremote.rmi.port=9093
+#      JMX_PORT: 9093
+#      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=${EXPOSED_HOSTNAME} -Dcom.sun.management.jmxremote.rmi.port=9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092,PLAINTEXT_HOST://${EXPOSED_HOSTNAME}:39092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-#      KAFKA_LOG_DIRS: /kafka
+    #      KAFKA_LOG_DIRS: /kafka
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-#      - ./kafka/logs/3:/kafka
+    #      - ./kafka/logs/3:/kafka
     networks:
       - elk
 

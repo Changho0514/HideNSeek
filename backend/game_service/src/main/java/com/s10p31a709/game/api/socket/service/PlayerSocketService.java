@@ -4,8 +4,7 @@ import com.s10p31a709.game.api.room.entity.Player;
 import com.s10p31a709.game.api.room.entity.Room;
 import com.s10p31a709.game.api.room.repository.RoomRepository;
 import com.s10p31a709.game.api.socket.model.StompPayload;
-import com.s10p31a709.game.common.config.GameProperties;
-import com.s10p31a709.game.common.feign.service.MemberServiceClient;
+import com.s10p31a709.game.logelk.service.HideLocationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,8 +21,7 @@ public class PlayerSocketService {
 
     private final RoomRepository roomRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final MemberServiceClient memberServiceClient;
-    private final GameProperties gameProperties;
+    private final HideLocationService hideLocationService;
 
     public void exitPlayer(String sessionId){
         Player player = roomRepository.findPlayerBySessionId(sessionId);
@@ -33,11 +31,6 @@ public class PlayerSocketService {
 
         StompPayload<Player> payload = new StompPayload<>("player.exit", room.getRoomId(), "system", player);
         simpMessagingTemplate.convertAndSend("/sub/room/"+room.getRoomId(), payload);
-        try {
-            memberServiceClient.deleteGuest(player.getNickname());
-        }catch (Exception e){
-            log.error(e.toString());
-        }
         roomRepository.deletePlayerByNickname(player.getNickname());
     }
 
@@ -62,6 +55,11 @@ public class PlayerSocketService {
 
     public void deadPlayer(StompPayload<Player> message){
         Player player = roomRepository.findPlayerByNickname(message.getData().getNickname());
+        if(player == null || player.getNickname() == null || player.getNickname().isEmpty()){
+            log.error("잘못된 player.dead요청: {}", message);
+            return;
+        }
+
         player.setIsDead(true);
 
         StompPayload<Player> payload = new StompPayload<>("player.dead", message.getRoomId(), "system", player);
@@ -75,17 +73,9 @@ public class PlayerSocketService {
         StompPayload<Player> payload = new StompPayload<>("player.object", message.getRoomId(), "system", player);
         simpMessagingTemplate.convertAndSend("/sub/room/"+message.getRoomId(), payload);
     }
-
-    public void choosePlayer(String roomId) {
-        int maxIdx = gameProperties.getObject().getMaxHiderIdx();
-        int[] arr = new int[]{new Random().nextInt(maxIdx), new Random().nextInt(maxIdx), new Random().nextInt(maxIdx)};
-        StompPayload<int[]> payload = new StompPayload<>("player.choose", roomId, "system", arr);
-        simpMessagingTemplate.convertAndSend("/sub/room/"+roomId, payload);
-    }
     
     public void playerFix(StompPayload<Player> message){
-        String roomId = message.getRoomId();;
-        Player player = message.getData();
-        // 숨은 정보 log 전송
+        hideLocationService.sendHideLocation(roomRepository.findRoomByRoomId(message.getRoomId()), message.getData());
     }
+
 }

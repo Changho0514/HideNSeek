@@ -18,3 +18,15 @@
 
 - pipeline.id: memberserverlogs
   path.config: "/usr/share/logstash/pipeline/memberserverlogs.conf" #docker 내부 경로
+
+- pipeline.id: prd.game-server.result-log
+  path.config: "/usr/share/logstash/pipeline/prd.game-server.result-log.conf" #docker 내부 경로
+
+- pipeline.id: dev.game-server.attacked-objects-log
+  path.config: "/usr/share/logstash/pipeline/dev.game-server.attacked-objects-log.conf" #docker 내부 경로
+
+- pipeline.id: dev.game-server.hide-location-log
+  path.config: "/usr/share/logstash/pipeline/dev.game-server.hide-location-log.conf" #docker 내부 경로
+
+- pipeline.id: dev.game-server.result-log
+  path.config: "/usr/share/logstash/pipeline/dev.game-server.result-log.conf" #docker 내부 경로

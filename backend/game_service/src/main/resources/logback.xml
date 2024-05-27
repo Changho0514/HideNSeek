@@ -24,7 +24,6 @@
 
     <!-- <root> 모든 logger에 대한 기본 설정을 정의 (INFO 레벨 이상의 메시지만 처리) -->
     <root level="INFO">
-<!--        <appender-ref ref="STDOUT"/>-->
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="KAFKA-ASYNC"/>
     </root>

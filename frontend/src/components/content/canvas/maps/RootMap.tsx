@@ -9,18 +9,18 @@ import { Animal } from './player/Animal';
 import { ObjectPlayer } from './player/ObjectPlayer';
 
 export function RootMap() {
-    const camera = useThree((three) => three.camera);
-    const controls = useRef<any>(null);
+    // const camera = useThree((three) => three.camera);
+    // const controls = useRef<any>(null);
 
     const currentRoom = useSelector(
         (state: any) => state.reduxFlag.userSlice.currentRoom
     );
 
-    useEffect(() => {
-        if (!controls.current) return;
-        camera.position.set(14, 14, 14);
-        controls.current.target.set(0, 0, 0);
-    }, [camera.position]);
+    // useEffect(() => {
+    //     if (!controls.current) return;
+    //     camera.position.set(14, 14, 14);
+    //     controls.current.target.set(0, 0, 0);
+    // }, [camera.position]);
     return (
         <>
             <>
@@ -42,6 +42,7 @@ export function RootMap() {
                                     modelIndex={selectedCharacterGlbNameIndex}
                                 /> */}
                                 <Animal
+                                    key={'animal player : ' + player.id}
                                     player={player}
                                     position={
                                         new Vector3(
@@ -63,7 +64,7 @@ export function RootMap() {
                             return (
                                 <>
                                     <ObjectPlayer
-                                        key={player.id}
+                                        key={'object player : ' + player.id}
                                         player={player}
                                         position={
                                             new Vector3(

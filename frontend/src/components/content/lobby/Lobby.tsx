@@ -1,26 +1,17 @@
 import { useState } from 'react';
 import { STEPS } from '../../../data/constant';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import {
-    CharacterSelectFinishedAtom,
-    SelectedCharacterGlbNameIndexAtom,
-} from '../../../store/PlayersAtom';
-import { socket } from '../../../sockets/clientSocket';
+import { useSetRecoilState } from 'recoil';
+import { CharacterSelectFinishedAtom } from '../../../store/PlayersAtom';
 import { isValidText } from '../../../util';
 import { MainCanvas } from '../canvas/MainCanvas';
 
 export function Lobby() {
     const [currentStep, setCurrentStep] = useState(STEPS.NICK_NAME);
     const [tempNickname, setTempNickname] = useState<string>('');
-    const [tempJobPosition] = useState<string>('');
-    const [selectedCharacterGlbNameIndex, setSelectedCharacterGlbNameIndex] =
-        useRecoilState(SelectedCharacterGlbNameIndexAtom);
 
     const setCharacterSelectFinished = useSetRecoilState(
         CharacterSelectFinishedAtom
     );
-
-    if (!socket) return null;
 
     const LoginContainer = () => {
         return (
@@ -77,40 +68,13 @@ export function Lobby() {
                                     if (!tempNickname) {
                                         return;
                                     }
-                                    socket.emit('initialize', {
-                                        tempNickname,
-                                        tempJobPosition,
-                                        selectedCharacterGlbNameIndex,
-                                        myRoom: { object: [] },
-                                    });
+
                                     setCharacterSelectFinished(true);
-                                }}
-                                onKeyUp={(e) => {
-                                    if (!tempNickname) {
-                                        return;
-                                    }
-                                    if (e.key === 'Enter') {
-                                        socket.emit('initialize', {
-                                            tempNickname,
-                                            tempJobPosition,
-                                            selectedCharacterGlbNameIndex,
-                                            myRoom: { object: [] },
-                                        });
-                                        setCharacterSelectFinished(true);
-                                    }
                                 }}
                             >
                                 이 모습으로 진행할래요.
                             </button>
-                            <button
-                                onClick={() => {
-                                    setSelectedCharacterGlbNameIndex((prev) => {
-                                        if (prev === undefined) return 1;
-                                        if (prev === 2) return 0;
-                                        return prev + 1;
-                                    });
-                                }}
-                            >
+                            <button onClick={() => {}}>
                                 다른 캐릭터도 볼래요
                             </button>
                             <button

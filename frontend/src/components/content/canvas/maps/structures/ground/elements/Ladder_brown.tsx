@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Ladder_brown(props: ObjectSettingType) {
+function Ladder_brownComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Ladder_brown.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [2, 4, 4],
+        args: [2, 2, 4],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -45,3 +46,13 @@ export function Ladder_brown(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Ladder_brown.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+  }
+
+export const Ladder_brown = React.memo(Ladder_brownComponent, areEqual);

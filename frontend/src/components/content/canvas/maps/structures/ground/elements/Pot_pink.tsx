@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,7 +19,7 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Pot_pink(props: ObjectSettingType) {
+function Pot_pinkComponent(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Pot_pink.glb'
     ) as GLTFResult;
@@ -45,3 +46,14 @@ export function Pot_pink(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Pot_pink.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+}
+
+
+export const Pot_pink = React.memo(Pot_pinkComponent, areEqual);

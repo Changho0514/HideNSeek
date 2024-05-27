@@ -8,6 +8,7 @@ import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
 import { ObjectSettingType } from '../../../../../../../types/GameType';
 import { useBox } from '@react-three/cannon';
+import React from 'react';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -18,12 +19,12 @@ type GLTFResult = GLTF & {
     };
 };
 
-export function Drawer_brown_1(props: ObjectSettingType) {
+function Drawer_brown_1Component(props: ObjectSettingType) {
     const { nodes, materials } = useGLTF(
         '/models/object/Drawer_brown_1.glb'
     ) as GLTFResult;
     const [ref] = useBox<THREE.Mesh>(() => ({
-        args: [3, 3, 2.6],
+        args: [2.8, 8, 2.6],
         mass: 0.1,
         position: props.position,
         rotation: props.rotation,
@@ -31,7 +32,7 @@ export function Drawer_brown_1(props: ObjectSettingType) {
         angularFactor: [0, 0, 0], // 모든 축에 대해 회전 제한
     }));
     return (
-        <group position={[-1, -1, -1]} dispose={null}>
+        <group position={[-1, -1, -1.3]} dispose={null}>
             <mesh
                 ref={ref}
                 geometry={nodes.Kitchen_Cabinet_4.geometry}
@@ -45,3 +46,13 @@ export function Drawer_brown_1(props: ObjectSettingType) {
 }
 
 useGLTF.preload('/models/object/Drawer_brown_1.glb');
+
+function areEqual(prevProps: ObjectSettingType, nextProps: ObjectSettingType) {
+    return (
+        prevProps.position[0] === nextProps.position[0] &&
+        prevProps.position[1] === nextProps.position[1] &&
+        prevProps.position[2] === nextProps.position[2]
+    );
+  }
+  
+export const Drawer_brown_1= React.memo(Drawer_brown_1Component, areEqual);

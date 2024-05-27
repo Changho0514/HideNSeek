@@ -88,4 +88,16 @@ public class RoomSocketController {
         // 시스템에서 판단 후 전송
     }
 
+    @MessageMapping("/room.rerollStart") @DeleteMapping("/room.rerollStart")
+    @Operation(summary = "리롤시작 (찾는시간의 1/2지점)")
+    public void rerollStart(@Payload StompPayload<Room> message){
+        // 시스템에서 판단 후 전송
+    }
+
+    @MessageMapping("/room.rerollEnd") @DeleteMapping("/room.rerollEnd")
+    @Operation(summary = "리롤종료(리롤시작 후 20초 후)")
+    public void rerollEnd(@Payload StompPayload<Room> message){
+        // 시스템에서 판단 후 전송
+    }
+
 }

@@ -17,7 +17,10 @@ import {
 import StompClient from '../../../../../../websocket/StompClient';
 import { useSelector } from 'react-redux';
 import { GLTF, SkeletonUtils } from 'three-stdlib';
-import { removeCollideObjectState } from '../../../../../../store/user-slice';
+import {
+    removeCollideObjectState,
+    cameraPositionState,
+} from '../../../../../../store/user-slice';
 import { store } from '../../../../../../store/store';
 
 interface GLTFAction extends AnimationClip {
@@ -49,7 +52,15 @@ type GLTFResult = GLTF & {
 };
 interface PlayerRef extends Group {
     viewUpDown?: number;
+    viewLR?: number;
 }
+
+class Observer {
+    position: Vector3 = new Vector3(0, 0, 0);
+    viewUpDown: number = 0;
+    viewLR: number = 0;
+}
+
 type ActionName =
     | 'Attack'
     | 'Bounce'
@@ -75,6 +86,9 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
     const [isWalking, setIsWalking] = useState(false);
     const keyState = useRef<{ [key: string]: boolean }>({});
     const [isJumping, setIsJumping] = useState(0);
+    const [jumpFlag, setJumpFlag] = useState<boolean>(false);
+    const [callsInLastSecond, setCallsInLastSecond] = useState(0);
+    const [delay, setDelay] = useState(0.00008);
     // Redux
     const playerNickname = player?.nickname;
     const meName = useSelector(
@@ -92,13 +106,23 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
     const collideState = useSelector(
         (state: any) => state.reduxFlag.userSlice.collideObj
     );
+    const mapState = useSelector(
+        (state: any) => state.reduxFlag.userSlice.mapSize
+    );
+    const myCameraPosition = useSelector(
+        (state: any) => state.reduxFlag.userSlice.cameraPosition
+    );
 
     const stompClient = StompClient.getInstance();
 
     const memoizedPosition = useMemo(() => position, []);
     const playerRef = useRef<PlayerRef>(null);
+    const nicknameRef = useRef<Group>(null);
     const prevPosition = useRef<Vector3 | null>(null);
     const isFirstFrame = useRef(true);
+    const observerRef = useRef<Observer | null>(null);
+    const accumulatedTimeRef = useRef(0.0);
+    const callsInLastSecondRef = useRef(callsInLastSecond);
 
     const { scene, materials, animations } = useGLTF(
         (() => {
@@ -126,7 +150,7 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
                 case 10:
                     return '/models/character/Reindeer_Animations.glb';
                 case 11:
-                    return '/models/character/SeaLion_Animations.glb';
+                    return '/models/character/Penguin_Animations.glb';
                 case 12:
                     return '/models/character/SnowOwl_Animations.glb';
                 case 13:
@@ -177,9 +201,6 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
     //     document.exitPointerLock();
     // };
 
-    // lockPointer();
-    // unlockPointer();
-
     const updateRotationX = (movementY: number) => {
         const rotationAmount = movementY * 0.001; // 회전 속도 조절을 위해 상수를 곱합니다.
 
@@ -206,6 +227,9 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
                 );
             }
         }
+        if (observerRef.current) {
+            observerRef.current.viewUpDown -= rotationAmount * 0.5; // 이 부분 수정
+        }
     };
 
     const updateRotationY = (movementX: number) => {
@@ -214,9 +238,39 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
         if (playerRef.current) {
             playerRef.current.rotation.y -= rotationAmount;
         }
+
+        if (observerRef.current) {
+            observerRef.current.viewLR -= rotationAmount;
+        }
     };
 
     useEffect(() => {
+        callsInLastSecondRef.current = callsInLastSecond;
+    }, [callsInLastSecond]);
+
+    useEffect(() => {
+        // 3초마다 호출
+        if (meInfo?.nickname === playerNickname) {
+            const intervalId = setInterval(() => {
+                console.log('송신 프레임 :', callsInLastSecondRef.current / 3);
+                setCallsInLastSecond(0); // 85 ~ 95
+                if (callsInLastSecondRef.current > 150) {
+                    setDelay((preDelay) => preDelay + 0.00007);
+                } else if (callsInLastSecondRef.current > 95) {
+                    setDelay((preDelay) => preDelay + 0.00001);
+                    // console.log('딜레이 값을 올리겠습니다.');
+                } else if (callsInLastSecondRef.current < 85) {
+                    setDelay((preDelay) => preDelay - 0.00001);
+                    // console.log('딜레이 값을 낮추겠습니다.');
+                }
+            }, 3000);
+
+            return () => clearInterval(intervalId);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (meInfo.nickname !== playerNickname) return;
         const handleMouseMove = (event: MouseEvent) => {
             // 마우스 포인터가 고정된 상태에서의 마우스 이동량을 감지합니다.
             if (meInfo?.nickname === playerNickname) {
@@ -234,20 +288,9 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
         };
     }, []);
 
-    // 이동
-    // useEffect(() => {
-    //     if (isWalking) {
-    //         lockPointer();
-    //         actions[animation]?.reset().fadeIn(0.2).play();
-    //     }
-    //     return () => {
-    //         actions[animation]?.fadeOut(0.5);
-    //     };
-    // }, [isWalking, animation, actions]);
-
     useEffect(() => {
         if (isWalking) {
-            lockPointer();
+            // lockPointer();
             if (!actions['Walk']?.isRunning()) {
                 // Run 상태가 아닌경우 Run으로
                 actions['Walk']?.reset().fadeIn(0.2).play();
@@ -262,11 +305,9 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
 
     // 키 입력
     useEffect(() => {
+        if (meInfo.nickname !== playerNickname) return;
         const handleKeyDown = (event: any) => {
             keyState.current[event.key] = true;
-            if (event.code === 'Space' && isJumping === 0) {
-                setIsJumping(1);
-            }
         };
 
         const handleKeyUp = (event: any) => {
@@ -281,21 +322,33 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
         };
     }, [isWalking]);
     useEffect(() => {
-        if (isJumping === 1) {
-            console.log('점프중입니다.');
+        if (meInfo.nickname !== playerNickname) return;
+        const handleJumpDown = (event: any) => {
+            if (event.code === 'Space' && !jumpFlag) {
+                setIsJumping(1);
+                setJumpFlag(true);
+            }
+        };
+        if (isJumping === 1 && jumpFlag) {
+            // console.log('점프중입니다.');
             setTimeout(() => {
-                console.log('점프 내려가는 중입니다.');
+                // console.log('점프 내려가는 중입니다.');
                 setIsJumping(2);
             }, 600); // Return after half a second
             setTimeout(() => {
-                console.log('점프 끝입니다.');
+                // console.log('점프 끝입니다.');
                 setIsJumping(0);
+                setJumpFlag(false);
             }, 1200);
         }
+        document.addEventListener('keydown', handleJumpDown);
+        return () => {
+            document.removeEventListener('keydown', handleJumpDown);
+        };
     }, [isJumping]);
 
     // Frame
-    useFrame(({ camera }) => {
+    useFrame(({ camera, clock }) => {
         if (isFirstFrame.current) {
             isFirstFrame.current = false;
             prevPosition.current = playerRef.current
@@ -305,25 +358,60 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
 
         if (!player || !playerRef.current) return;
 
-        if (meInfo?.nickname === playerNickname) {
-            // 내 캐릭터의 경우
-            const moveVector = new Vector3(
-                (keyState.current['a'] ? 1 : 0) -
-                    (keyState.current['d'] ? 1 : 0),
-                0,
-                (keyState.current['s'] ? 1 : 0) -
-                    (keyState.current['w'] ? 1 : 0)
-            );
-
-            if (!moveVector.equals(new Vector3(0, 0, 0)) || isJumping != 0) {
-                // 이동중
-                moveVector.normalize().multiplyScalar(0.2); // 속도조절
-                setIsWalking(true);
-                setAnimation('Walk');
-                // 캐릭터가 바라보는 방향으로 이동 벡터를 회전시킵니다.
-                const forward = new Vector3(0, 0, -1).applyQuaternion(
-                    playerRef.current.quaternion
+        if (
+            (roomState.roomState == 1 || roomState.roomState == 2) &&
+            meInfo.isSeeker === true &&
+            meInfo.nickname === playerNickname
+        ) {
+            // 게임 대기시간
+            // 관전모드
+            lockPointer();
+            if (!observerRef.current) {
+                // console.log("생성!")
+                observerRef.current = new Observer();
+                observerRef.current.position = new Vector3(
+                    playerRef.current.position.x + 12,
+                    playerRef.current.position.y + 12,
+                    playerRef.current.position.z + 12
                 );
+                observerRef.current.viewLR = playerRef.current.rotation.y;
+                // observerRef.current.viewUpDown = playerRef.current.viewUpDown;
+                observerRef.current.viewUpDown = 0;
+            }
+
+            const moveVector = new Vector3(
+                (keyState.current['d'] ||
+                keyState.current['D'] ||
+                keyState.current['ㅇ']
+                    ? 1
+                    : 0) -
+                    (keyState.current['a'] ||
+                    keyState.current['A'] ||
+                    keyState.current['ㅁ']
+                        ? 1
+                        : 0),
+                0,
+                (keyState.current['w'] ||
+                keyState.current['W'] ||
+                keyState.current['ㅈ']
+                    ? 1
+                    : 0) -
+                    (keyState.current['s'] ||
+                    keyState.current['S'] ||
+                    keyState.current['ㄴ']
+                        ? 1
+                        : 0)
+            );
+            if (!moveVector.equals(new Vector3(0, 0, 0))) {
+                // lockPointer();
+                moveVector.normalize().multiplyScalar(0.2); // 속도조절
+
+                const forward = new Vector3(
+                    Math.sin(observerRef.current.viewLR), // viewLR 값으로 삼각함수를 통해 x 값을 설정
+                    Math.sin(observerRef.current.viewUpDown),
+                    Math.cos(observerRef.current.viewLR) // viewLR 값으로 삼각함수를 통해 z 값을 설정
+                ).normalize(); // 벡터를 정규화하여 길이를 1로 만듭니다.
+
                 const moveDirection = forward
                     .clone()
                     .multiplyScalar(moveVector.z)
@@ -332,200 +420,344 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
                             moveVector.x
                         )
                     );
-                if (isJumping === 1) {
-                    moveDirection.y = 0.08;
-                } else {
-                    moveDirection.y = -0.08;
-                }
-                console.log(moveDirection);
 
-                if (collideState.length > 0) {
-                    console.log(moveDirection);
-                    const originPos = playerRef.current.position.clone();
-                    const newPos = originPos.clone().add(moveDirection);
-                    collideState.map((item: CollideObject, index: number) => {
-                        const centerX = (item.minX + item.maxX) / 2;
-                        const centerY = (item.minY + item.maxZ) / 2;
-                        const centerZ = (item.minY + item.maxZ) / 2;
-
-                        if (
-                            originPos.x >= item.minX - 1 &&
-                            originPos.x <= item.maxX + 1 &&
-                            originPos.y >= item.minY - 1 &&
-                            originPos.y <= item.maxY + 1 &&
-                            originPos.z >= item.minZ - 1 &&
-                            originPos.z <= item.maxZ + 1
-                        ) {
-                            if (originPos.x < centerX) {
-                                if (newPos.x > originPos.x) {
-                                    moveDirection.x = 0;
-                                }
-                            } else if (originPos.x >= centerX) {
-                                if (newPos.x <= originPos.x) {
-                                    moveDirection.x = 0;
-                                }
-                            }
-                            if (originPos.y < centerY) {
-                                if (newPos.y > originPos.y) {
-                                    moveDirection.y = 0;
-                                }
-                            } else if (originPos.y >= centerY) {
-                                if (newPos.y <= originPos.y) {
-                                    moveDirection.y = 0;
-                                }
-                            }
-                            if (originPos.z < centerZ) {
-                                if (newPos.z > originPos.z) {
-                                    moveDirection.z = 0;
-                                }
-                            } else if (originPos.z >= centerZ) {
-                                if (newPos.z <= originPos.z) {
-                                    moveDirection.z = 0;
-                                }
-                            }
-                            if (playerRef.current) {
-                                if (playerRef.current.position.y <= 0) {
-                                    playerRef.current.position.y = 0.1;
-                                }
-                                playerRef.current.position.add(moveDirection);
-                            }
-                        } else {
-                            store.dispatch(removeCollideObjectState(index));
-                        }
-                    });
-                } else {
-                    if (playerRef.current.position.y <= 0) {
-                        playerRef.current.position.y = 0.1;
-                    }
-                    playerRef.current.position.add(moveDirection);
-
-                    console.log(playerRef.current.position);
-                }
-
-                stompClient.sendMessage(
-                    `/player.move`,
-                    JSON.stringify({
-                        type: 'player.move',
-                        roomId: roomId,
-                        sender: meName,
-                        data: {
-                            nickname: meName,
-                            position: [
-                                playerRef.current.position.x,
-                                playerRef.current.position.y,
-                                playerRef.current.position.z,
-                            ],
-                            direction: [
-                                moveDirection.x,
-                                moveDirection.y,
-                                moveDirection.z,
-                            ],
-                        },
-                    })
-                );
-            } else {
-                // 고정된 상태
-                setIsWalking(false);
-                setAnimation('Roll');
-                
-                stompClient.sendMessage(
-                    `/player.move`,
-                    JSON.stringify({
-                        type: 'player.move',
-                        roomId: roomId,
-                        sender: meName,
-                        data: {
-                            nickname: meName,
-                            position: [
-                                playerRef.current.position.x,
-                                playerRef.current.position.y,
-                                playerRef.current.position.z,
-                            ],
-                            direction: [
-                                Math.sin(playerRef.current.rotation.y),
-                                0,
-                                Math.cos(playerRef.current.rotation.y),
-                            ],
-                        },
-                    })
-                );
-                setAnimation('Walk');
+                observerRef.current.position.add(moveDirection);
             }
 
-            // 카메라 설정
-            const playerPosition = playerRef.current.position.clone();
-            playerPosition.setY(+3);
-
-            const playerDirection = new Vector3( // 플레이어가 바라보는 곳
-                Math.sin(playerRef.current.rotation.y),
-                playerRef.current.viewUpDown, // 아래 위
-                Math.cos(playerRef.current.rotation.y)
+            // 프리뷰 카메라 설정
+            const observerDirection = new Vector3( // 플레이어가 바라보는 곳
+                Math.sin(observerRef.current.viewLR),
+                observerRef.current.viewUpDown, // 아래 위
+                Math.cos(observerRef.current.viewLR)
             );
+            const cameraTarget = observerRef.current.position
+                .clone()
+                .add(observerDirection.multiplyScalar(3));
 
             camera.position.set(
-                playerPosition.x + playerDirection.x,
-                playerPosition.y,
-                playerPosition.z + playerDirection.z
+                observerRef.current.position.x,
+                observerRef.current.position.y,
+                observerRef.current.position.z
             );
-            const cameraTarget = playerPosition
-                .clone()
-                .add(playerDirection.multiplyScalar(3));
-            camera.lookAt(cameraTarget); // 정면보다 더 앞으로 설정!
-            camera.zoom = 0.6;
-            camera.updateProjectionMatrix();
+            camera.lookAt(cameraTarget);
         } else {
-            // 다른 플레이어의 캐릭터
-            roomState.roomPlayers.forEach((otherPlayer: any) => {
+            // 게임 시작
+            if (meInfo?.nickname === playerNickname) {
+                // 내 캐릭터인 경우
+                lockPointer();
+                const delta = clock.getDelta(); // 프레임 간 시간 간격을 가져옵니다.
+                accumulatedTimeRef.current += delta;
+
+                // 내 캐릭터의 경우
+                const moveVector = new Vector3(
+                    (keyState.current['a'] ||
+                    keyState.current['A'] ||
+                    keyState.current['ㅁ']
+                        ? 1
+                        : 0) -
+                        (keyState.current['d'] ||
+                        keyState.current['D'] ||
+                        keyState.current['ㅇ']
+                            ? 1
+                            : 0),
+                    0,
+                    (keyState.current['s'] ||
+                    keyState.current['S'] ||
+                    keyState.current['ㄴ']
+                        ? 1
+                        : 0) -
+                        (keyState.current['w'] ||
+                        keyState.current['W'] ||
+                        keyState.current['ㅈ']
+                            ? 1
+                            : 0)
+                );
+
                 if (
-                    otherPlayer.nickname !== meInfo?.nickname &&
-                    otherPlayer.isSeeker === true
+                    !moveVector.equals(new Vector3(0, 0, 0)) ||
+                    isJumping != 0
                 ) {
-                    const otherPlayerRef = playerRef.current;
-                    if (otherPlayerRef) {
-                        // 위치 적용
-                        otherPlayerRef?.position.set(
-                            otherPlayer.position[0],
-                            otherPlayer.position[1],
-                            otherPlayer.position[2]
+                    // lockPointer();
+                    // 이동중
+                    moveVector.normalize().multiplyScalar(0.2); // 속도조절
+                    setIsWalking(true);
+                    setAnimation('Walk');
+                    // 캐릭터가 바라보는 방향으로 이동 벡터를 회전시킵니다.
+                    const forward = new Vector3(0, 0, -1).applyQuaternion(
+                        playerRef.current.quaternion
+                    );
+                    const moveDirection = forward
+                        .clone()
+                        .multiplyScalar(moveVector.z)
+                        .add(
+                            new Vector3(
+                                -forward.z,
+                                0,
+                                forward.x
+                            ).multiplyScalar(moveVector.x)
                         );
+                    if (isJumping === 1) {
+                        moveDirection.y = 0.08;
+                    } else {
+                        moveDirection.y = -0.08;
+                    }
 
-                        const rotationVector = new Vector3(
-                            otherPlayer.direction[0],
-                            otherPlayer.direction[1],
-                            otherPlayer.direction[2]
-                        );
-                        rotationVector.normalize(); // 회전 벡터를 정규화합니다.
-                        const forward = new Vector3(0, 0, -1).applyQuaternion(
-                            new Quaternion().setFromUnitVectors(
-                                new Vector3(0, 0, -1),
-                                rotationVector
-                            )
-                        );
-                        otherPlayerRef.lookAt(
-                            otherPlayerRef.position.clone().add(forward)
-                        );
+                    if (collideState.length > 0) {
+                        const originPos = playerRef.current.position.clone();
+                        const newPos = originPos.clone().add(moveDirection);
+                        collideState.map(
+                            (item: CollideObject, index: number) => {
+                                const centerX = (item.minX + item.maxX) / 2;
+                                const centerY = (item.minY + item.maxZ) / 2;
+                                const centerZ = (item.minZ + item.maxZ) / 2;
 
-                        // walking 유무 처리
-                        if (
-                            prevPosition.current &&
-                            !otherPlayerRef.position.equals(
-                                prevPosition.current
-                            )
-                        ) {
-                            setIsWalking(true);
-                            prevPosition.current =
-                                otherPlayerRef.position.clone();
-                            // 부드럽게 보간 처리
-                            otherPlayerRef.position.lerp(
-                                prevPosition.current,
-                                0.1
-                            ); // 두 번째 인수는 보간 비율입니다.
-                        } else {
-                            setIsWalking(false);
+                                if (
+                                    originPos.x >= item.minX - 1 &&
+                                    originPos.x <= item.maxX + 1 &&
+                                    originPos.y >= item.minY - 1 &&
+                                    originPos.y <= item.maxY + 1 &&
+                                    originPos.z >= item.minZ - 1 &&
+                                    originPos.z <= item.maxZ + 1
+                                ) {
+                                    originPos.y += 0.1;
+                                    newPos.y += 0.1;
+                                    if (originPos.x < centerX) {
+                                        if (newPos.x > originPos.x) {
+                                            moveDirection.x = 0;
+                                        }
+                                    } else if (originPos.x >= centerX) {
+                                        if (newPos.x <= originPos.x) {
+                                            moveDirection.x = 0;
+                                        }
+                                    }
+                                    if (originPos.y < centerY) {
+                                        if (newPos.y > originPos.y) {
+                                            moveDirection.y = 0;
+                                        }
+                                    } else if (originPos.y >= centerY) {
+                                        if (newPos.y <= originPos.y) {
+                                            moveDirection.y = 0;
+                                        }
+                                    }
+                                    if (originPos.z < centerZ) {
+                                        if (newPos.z > originPos.z) {
+                                            moveDirection.z = 0;
+                                        }
+                                    } else if (originPos.z >= centerZ) {
+                                        if (newPos.z <= originPos.z) {
+                                            moveDirection.z = 0;
+                                        }
+                                    }
+                                    if (playerRef.current) {
+                                        if (playerRef.current.position.y <= 0) {
+                                            playerRef.current.position.y = 0.1;
+                                        }
+                                        playerRef.current.position.add(
+                                            moveDirection
+                                        );
+                                    }
+                                } else {
+                                    store.dispatch(
+                                        removeCollideObjectState(index)
+                                    );
+                                }
+                            }
+                        );
+                    } else {
+                        if (playerRef.current.position.y <= 0) {
+                            playerRef.current.position.y = 0.1;
+                        }
+                        playerRef.current.position.add(moveDirection);
+                    }
+                    if (
+                        playerRef.current.position.x > mapState.maxX ||
+                        playerRef.current.position.x < mapState.minX ||
+                        playerRef.current.position.z > mapState.maxZ ||
+                        playerRef.current.position.z < mapState.minZ ||
+                        playerRef.current.position.y > mapState.maxY ||
+                        playerRef.current.position.y < mapState.minY
+                    ) {
+                        playerRef.current.position.set(0, 0, 0);
+                    }
+
+                    if (accumulatedTimeRef.current >= delay) {
+                        accumulatedTimeRef.current = 0;
+                        stompClient.sendMessage(
+                            `/player.move`,
+                            JSON.stringify({
+                                type: 'player.move',
+                                roomId: roomId,
+                                sender: meName,
+                                data: {
+                                    nickname: meName,
+                                    position: [
+                                        playerRef.current.position.x,
+                                        playerRef.current.position.y,
+                                        playerRef.current.position.z,
+                                    ],
+                                    direction: [
+                                        moveDirection.x,
+                                        moveDirection.y,
+                                        moveDirection.z,
+                                    ],
+                                },
+                            })
+                        );
+                        setCallsInLastSecond((prevCount) => prevCount + 1);
+                    }
+                } else {
+                    // 고정된 상태
+                    setIsWalking(false);
+                    setAnimation('Roll');
+
+                    if (accumulatedTimeRef.current >= delay) {
+                        accumulatedTimeRef.current = 0;
+                        stompClient.sendMessage(
+                            `/player.move`,
+                            JSON.stringify({
+                                type: 'player.move',
+                                roomId: roomId,
+                                sender: meName,
+                                data: {
+                                    nickname: meName,
+                                    position: [
+                                        playerRef.current.position.x,
+                                        playerRef.current.position.y,
+                                        playerRef.current.position.z,
+                                    ],
+                                    direction: [
+                                        Math.sin(playerRef.current.rotation.y),
+                                        0,
+                                        Math.cos(playerRef.current.rotation.y),
+                                    ],
+                                },
+                            })
+                        );
+                        setCallsInLastSecond((prevCount) => prevCount + 1);
+                    }
+                    setAnimation('Walk');
+                }
+
+                // 카메라 설정
+                const playerPosition = playerRef.current.position.clone();
+                playerPosition.setY(+3);
+
+                const playerDirection = new Vector3( // 플레이어가 바라보는 곳
+                    Math.sin(playerRef.current.rotation.y),
+                    playerRef.current.viewUpDown, // 아래 위
+                    Math.cos(playerRef.current.rotation.y)
+                );
+                if (isJumping) {
+                    // 점프중
+                    camera.position.set(
+                        playerPosition.x + playerDirection.x,
+                        playerPosition.y + playerRef.current.position.y,
+                        playerPosition.z + playerDirection.z
+                    );
+                } else {
+                    camera.position.set(
+                        playerPosition.x + playerDirection.x,
+                        playerPosition.y,
+                        playerPosition.z + playerDirection.z
+                    );
+                }
+                const cameraTarget = playerPosition
+                    .clone()
+                    .add(playerDirection.multiplyScalar(11));
+                camera.lookAt(cameraTarget); // 정면보다 더 앞으로 설정!
+                camera.zoom = 0.4;
+                camera.updateProjectionMatrix();
+            } else {
+                // 다른 플레이어의 캐릭터
+                roomState.roomPlayers.forEach((otherPlayer: any) => {
+                    if (
+                        otherPlayer.nickname !== meInfo?.nickname &&
+                        otherPlayer.nickname === playerNickname &&
+                        otherPlayer.isSeeker === true
+                    ) {
+                        const otherPlayerRef = playerRef.current;
+                        if (otherPlayerRef) {
+                            // 위치 적용
+                            otherPlayerRef?.position.set(
+                                otherPlayer.position[0],
+                                otherPlayer.position[1],
+                                otherPlayer.position[2]
+                            );
+
+                            const rotationVector = new Vector3(
+                                otherPlayer.direction[0],
+                                otherPlayer.direction[1],
+                                otherPlayer.direction[2]
+                            );
+                            rotationVector.normalize(); // 회전 벡터를 정규화합니다.
+                            const forward = new Vector3(
+                                0,
+                                0,
+                                -1
+                            ).applyQuaternion(
+                                new Quaternion().setFromUnitVectors(
+                                    new Vector3(0, 0, -1),
+                                    rotationVector
+                                )
+                            );
+                            otherPlayerRef.lookAt(
+                                otherPlayerRef.position.clone().add(forward)
+                            );
+
+                            // walking 유무 처리
+                            if (
+                                prevPosition.current &&
+                                !otherPlayerRef.position.equals(
+                                    prevPosition.current
+                                )
+                            ) {
+                                setIsWalking(true);
+                                prevPosition.current =
+                                    otherPlayerRef.position.clone();
+                                // 부드럽게 보간 처리
+                                otherPlayerRef.position.lerp(
+                                    prevPosition.current,
+                                    0.1
+                                ); // 두 번째 인수는 보간 비율입니다.
+                            } else {
+                                setIsWalking(false);
+                            }
                         }
                     }
+                });
+            }
+        }
+
+        if (meInfo.isDead && meInfo.isSeeker) {
+            for (const otherPlayer of roomState.roomPlayers) {
+                // 특정 조건을 만족하면 반복을 중지
+                if (otherPlayer.isSeeker === true && !otherPlayer.isDead) {
+                    let observedPlayer = otherPlayer;
+                    camera.position.set(
+                        observedPlayer.position[0] + 5,
+                        observedPlayer.position[1] + 5,
+                        observedPlayer.position[2] + 5
+                    );
+                    camera.lookAt(
+                        observedPlayer.position[0],
+                        observedPlayer.position[1],
+                        observedPlayer.position[2]
+                    );
+                    break;
                 }
-            });
+            }
+        }
+        // if(meInfo.nickname === playerNickname) {
+        //     store.dispatch(cameraPositionState(camera.position.clone()))
+        // }
+        if (nicknameRef.current) {
+            nicknameRef.current.position.set(
+                playerRef.current.position.x,
+                playerRef.current.position.y + 3,
+                playerRef.current.position.z
+            );
+            // nicknameRef.current.lookAt(myCameraPosition);
+            nicknameRef.current.lookAt(camera.position);
         }
     });
 
@@ -536,6 +768,7 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
         playerNickname,
         nodes,
         material,
+        nicknameRef,
     };
 
     function returnMaterial(num: number | undefined) {
@@ -563,7 +796,7 @@ export const useAnimal = ({ player, position, modelIndex }: PlayerInitType) => {
             case 10:
                 return materials.M_Reindeer;
             case 11:
-                return materials.M_SeaLion;
+                return materials.M_Penguin;
             case 12:
                 return materials.M_SnowOwl;
             case 13:

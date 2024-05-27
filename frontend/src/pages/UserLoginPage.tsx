@@ -5,6 +5,8 @@ import { UserLoginInfo } from '../types/GameType';
 import { useDispatch } from 'react-redux';
 import { userNicknameState } from '../store/user-slice';
 import { httpStatusCode } from '../components/utils/http-status';
+import backgroundImage from '../assets/images/bg/background-main.png';
+import textLoginUser from '../assets/images/text/text_login_user.png';
 
 export default function UserLoginPage() {
     const [userNickname, setUserNickname] = useState<string>('');
@@ -23,11 +25,12 @@ export default function UserLoginPage() {
 
             const res = await userLogin(userLoginInfo);
             if (res.status === httpStatusCode.OK) {
-                console.log('로그인 성공');
+                // console.log('로그인 성공');
                 dispatch(userNicknameState(userLoginInfo.nickname));
                 navigate('/selectchannel');
             } else {
-                console.log('로그인 실패');
+                alert('로그인에 실패하였습니다.');
+                // console.log('로그인 실패');
             }
         }
     };
@@ -35,11 +38,10 @@ export default function UserLoginPage() {
         <section
             className="w-full h-full flex flex-col items-center justify-center"
             style={{
-                backgroundImage:
-                    'url(/src/assets/images/bg/background-main.png)',
+                backgroundImage: `url(${backgroundImage})`,
             }}
         >
-            <p className="text-[2.4vw]">게스트 로그인</p>
+            <img src={textLoginUser} alt="" />
             <div className="relative w-[50%] flex justify-between my-[2vw]">
                 <h5 className="w-[35%] text-white text-[3vw] text-start">
                     닉네임
@@ -73,7 +75,7 @@ export default function UserLoginPage() {
                     login();
                 }}
             >
-                <div className="border-[0.3vw] color-border-main rounded-[0.6vw] px-[2vw] py-[0.4vw] color-text-main bg-white text-[2.6vw] cursor-pointer hover:color-bg-main hover:text-white">
+                <div className="border-[0.3vw] color-border-main rounded-[0.6vw] px-[2vw] py-[0.4vw] color-text-main bg-white text-[2.6vw] cursor-pointer hover:color-bg-main hover:text-white btn-animation">
                     Guest
                 </div>
             </div>

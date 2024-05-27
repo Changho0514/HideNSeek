@@ -11,9 +11,9 @@ public class GameProperties {
 
     private Time time;
     private int maxCapacity;
-    private Object object;
     private int fps;
-
+    private RichRoom richRoom;
+    private Farm farm;
 
     @Data
     public static class Time {
@@ -22,10 +22,19 @@ public class GameProperties {
         private int seek;
         private int result;
     }
+
     @Data
-    public static class Object {
+    public static class GameMap {
         private int maxSeekerIdx;
         private int maxHiderIdx;
+        private Double[] startPoint;
+        private int maxMapValue;
+    }
+
+    public static class RichRoom extends GameMap{
+    }
+
+    public static class Farm extends GameMap{
     }
 
 }

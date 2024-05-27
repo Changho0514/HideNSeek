@@ -29,9 +29,11 @@ public class Room {
 
     private String roomMap;
 
+    private Integer mapValue;
+
     private List<Player> roomPlayers;
 
-    private List<Player> computers;
+    private Integer botCnt;
 
     @JsonIgnore
     private boolean flag;
